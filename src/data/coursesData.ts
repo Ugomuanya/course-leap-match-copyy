@@ -522,6 +522,316 @@ export const coursesData: { [key: string]: School[] } = {
         }
       ]
     }
+  ],
+
+  Business: [
+    {
+      name: "School of Business",
+      courses: [
+        {
+          name: "BA (Hons) Accountancy and Finance",
+          description: "Address real world financial challenges by developing critical thinking, commercial awareness with accountancy skills.",
+          interests: ["Financial analysis", "Problem Solving", "Mathematical skills"],
+          link: "https://www.lincoln.ac.uk/course/accfinub/",
+          entryGrades: "104-112"
+        },
+        {
+          name: "BSc (Hons) Banking and Finance",
+          description: "Practical + real world experience in financial systems, decision making preparing for future career.",
+          interests: ["Maths", "Computer science", "Decision making"],
+          link: "https://www.lincoln.ac.uk/studywithus/subjects/accountancyfinanceandeconomics/",
+          entryGrades: "96-104"
+        },
+        {
+          name: "BSc (Hons) Economics and Finance",
+          description: "Analyse financial and economic events, focusing on practical skills in financial techniques + market decision making.",
+          interests: ["Accountancy", "Maths", "Economics", "Financial analysis"],
+          link: "https://www.lincoln.ac.uk/course/ecofinub/",
+          entryGrades: "96-104"
+        },
+        {
+          name: "BA (Hons) Business and Management",
+          description: "Dynamic global business environment through practical experience, critical thinking and broad management knowledge.",
+          interests: ["Adaptability", "Problem based learning", "Leadership"],
+          link: "https://www.lincoln.ac.uk/studywithus/subjects/management/",
+          entryGrades: "96-104"
+        },
+        {
+          name: "BA (Hons) Business",
+          description: "Developing skills through an international perspective, offering practical experience in global business.",
+          interests: ["Critical thinking", "Problem solving", "Analytical skills"],
+          link: "https://www.lincoln.ac.uk/course/busprpub/",
+          entryGrades: "96-104"
+        },
+        {
+          name: "BA (Hons) Business Economics",
+          description: "Analyse + solve complex business problems in international and national economic context.",
+          interests: ["Economics", "Analytical thinking", "Business decision making"],
+          link: "https://www.lincoln.ac.uk/course/busecoub/",
+          entryGrades: "96-104"
+        },
+        {
+          name: "BSc (Hons) Economics",
+          description: "Prepares to analyse evolving economic issues through critical thinking and rigorous frameworks.",
+          interests: ["Economics", "Data interpretation", "Problem solving"],
+          link: "https://www.lincoln.ac.uk/course/ecoecoub/",
+          entryGrades: "104-112"
+        },
+        {
+          name: "BA (Hons) International Business Management",
+          description: "Developing understanding of cross-cultural communication + decision making.",
+          interests: ["Cultural Competency", "Global market analysis"],
+          link: "https://www.lincoln.ac.uk/studywithus/subjects/management/",
+          entryGrades: "96-104"
+        },
+        {
+          name: "BA (Hons) International Tourism Management",
+          description: "Excel in dynamic tourism industry by developing expertise in global planning, management and sustainable practices.",
+          interests: ["Tourism strategy", "Global travel operations", "Sustainability", "Destination marketing"],
+          link: "https://www.lincoln.ac.uk/course/inttouub/",
+          entryGrades: "96-104"
+        },
+        {
+          name: "BA (Hons) Sports Business Management",
+          description: "Commercial and societal aspects of global sport industries, focusing on management + policy.",
+          interests: ["Sports", "Business", "Practical skills"],
+          link: "https://www.lincoln.ac.uk/studywithus/subjects/management/",
+          entryGrades: "96-104"
+        },
+        {
+          name: "BSc (Hons) Events Management",
+          description: "Industrial knowledge and leadership abilities for a successful career in global event industry with hands on experience.",
+          interests: ["Event design + planning", "Business leadership", "Problem solving"],
+          link: "https://www.lincoln.ac.uk/studywithus/subjects/marketingandtourism/",
+          entryGrades: "96-104"
+        },
+        {
+          name: "BA (Hons) Business and Marketing",
+          description: "Emphasizes understanding the international business landscape, identifying marketing opportunities.",
+          interests: ["Marketing strategy", "Marketing analysis", "Problem solving"],
+          link: "https://www.lincoln.ac.uk/course/mktprpub/",
+          entryGrades: "96-104"
+        },
+        {
+          name: "BA (Hons) Marketing and Advertising",
+          description: "Diverse roles in the evolving marketing industry by developing strategic, creative marketing skills.",
+          interests: ["Marketing", "Computing", "Creative"],
+          link: "https://www.lincoln.ac.uk/course/advmktub/",
+          entryGrades: "104"
+        }
+      ]
+    }
+  ],
+
+  Arts: [
+    {
+      name: "School of Design",
+      courses: [
+        {
+          name: "BA (Hons) Creative Advertising",
+          description: "Developing creativity, conceptual thinking and communication skills to craft ideas that influence audiences + industrial collabs.",
+          interests: ["Creativity", "Communication", "Media production"],
+          link: "https://www.lincoln.ac.uk/studywithus/subjects/artanddesign/",
+          entryGrades: "104-112"
+        },
+        {
+          name: "BA (Hons) Fine Art",
+          description: "Emphasizes developing socially engaged and versatile artists who collab across platforms.",
+          interests: ["Artistic practices", "Collaboration", "Digital media"],
+          link: "https://www.lincoln.ac.uk/course/artartub/",
+          entryGrades: "104-112"
+        },
+        {
+          name: "BA (Hons) Illustration",
+          description: "Develop craftmanship, creativity through traditional techniques. Completing project virtually and in person.",
+          interests: ["Illustration", "Digital art", "Storytelling"],
+          link: "https://www.lincoln.ac.uk/course/illillub/",
+          entryGrades: "104-112"
+        },
+        {
+          name: "BA (Hons) Photography",
+          description: "Encouraging creative interpretation of communities and environments through practical projects.",
+          interests: ["Photography", "Storytelling"],
+          link: "https://www.lincoln.ac.uk/course/clmclmub/",
+          entryGrades: "104-112"
+        },
+        {
+          name: "BA (Hons) Animation and Visual Effects",
+          description: "Prepare students as creative animators with opportunities to produce award winning short films.",
+          interests: ["Animation Techniques", "Storytelling", "Digital visualization"],
+          link: "https://www.lincoln.ac.uk/course/anianiub/",
+          entryGrades: "104-112"
+        },
+        {
+          name: "BA (Hons) Graphic Design",
+          description: "Developing creative storytelling skills across various media. Industry-standard tech and opportunities for international competition and portfolio development.",
+          interests: ["Visual storytelling", "Digital design", "Creative projects"],
+          link: "https://www.lincoln.ac.uk/course/gragraub/",
+          entryGrades: "96-112"
+        },
+        {
+          name: "BA (Hons) Product Design",
+          description: "Creating innovative challenges by combining creative design with digital tech.",
+          interests: ["Product design", "Tech fabrication"],
+          link: "https://www.lincoln.ac.uk/course/prdprdub/",
+          entryGrades: "104-112"
+        },
+        {
+          name: "BArch (Hons) Architecture",
+          description: "Heritage and archaeology with contemporary design for a career in architecture through creative projects.",
+          interests: ["Architectural Design", "Heritage Studies", "Maths"],
+          link: "https://www.lincoln.ac.uk/course/arcboaub/",
+          entryGrades: "104-112"
+        },
+        {
+          name: "BA (Hons) Interior Architecture and Design",
+          description: "Innovative and ethical design skills through interdisciplinary approach leading to positive change.",
+          interests: ["Maths", "Architectural design", "Interior design"],
+          link: "https://www.lincoln.ac.uk/course/intintub/",
+          entryGrades: "104-112"
+        }
+      ]
+    }
+  ],
+
+  Humanities: [
+    {
+      name: "School of Humanities and Performing Arts",
+      courses: [
+        {
+          name: "BA (Hons) Drama and English",
+          description: "Foundational training of physical skills, voice, writing, design in performance manner.",
+          interests: ["Performance", "Physical theatre", "Stage design"],
+          link: "https://www.lincoln.ac.uk/course/enldraub/",
+          entryGrades: "104-112"
+        },
+        {
+          name: "BA (Hons) Drama, Theatre and Performance",
+          description: "Exploration of theatre traditions with opportunity of international study to develop career prospects.",
+          interests: ["Theatrical performance", "Creative practice", "Dance", "Music"],
+          link: "https://www.lincoln.ac.uk/course/dradraub/",
+          entryGrades: "104-112"
+        },
+        {
+          name: "BA (Hons) Musical Theatre",
+          description: "Comprehensive education in creating, performing theatre. Opportunity to learn from industry practitioners.",
+          interests: ["Music", "Performance", "Theatre"],
+          link: "https://www.lincoln.ac.uk/course/mustheub/",
+          entryGrades: "104-112"
+        },
+        {
+          name: "BA (Hons) Technical Theatre and Stage Management",
+          description: "Prepares students for careers in live arts by practicing skills and improving industrial knowledge.",
+          interests: ["Performance", "Theatre design", "Stage management"],
+          link: "https://www.lincoln.ac.uk/course/tectheub/",
+          entryGrades: "104-112"
+        },
+        {
+          name: "BA (Hons) Film and Media",
+          description: "Learn how film and tv influences society and culture. Opportunities to explore media theory + history.",
+          interests: ["Media analysis", "Film + tv studies", "Critical theory"],
+          entryGrades: "104-112"
+        },
+        {
+          name: "BA (Hons) Film and Television Studies",
+          description: "Exploring documentaries + heritage cinema while preparing for creative and professional opportunities in media industry.",
+          interests: ["Critical analysis", "Media production", "Industry engagement"],
+          link: "https://www.lincoln.ac.uk/course/ftvftvub/",
+          entryGrades: "104-112"
+        },
+        {
+          name: "BA (Hons) Film Production",
+          description: "Professional training into film making with industrial standard facilities with mentoring from award winning professionals.",
+          interests: ["Film making", "Industrial equipment usage"],
+          link: "https://www.lincoln.ac.uk/course/medproub/",
+          entryGrades: "104-112"
+        },
+        {
+          name: "BA (Hons) Media Production",
+          description: "Creative and technical skills across diverse media platforms and emerging technology.",
+          interests: ["Media Creation", "Digital tech", "Innovation design"],
+          link: "https://www.lincoln.ac.uk/course/medmedub/",
+          entryGrades: "104-112"
+        },
+        {
+          name: "BA (Hons) Media Studies",
+          description: "Critical and creative exploration of how digital media shapes society. Enabling students to understand the pervasive role of media.",
+          interests: ["Media analysis", "Communication", "Digital tech"],
+          link: "https://www.lincoln.ac.uk/course/mdsmdsub/",
+          entryGrades: "104"
+        },
+        {
+          name: "BA (Hons) Creative Writing",
+          description: "Develop unique voices across diverse genres, expanding creative and technical writing.",
+          interests: ["Creative writing", "Genre diversity", "Literature"],
+          link: "https://www.lincoln.ac.uk/course/crwcrwub/",
+          entryGrades: "104-112"
+        },
+        {
+          name: "BA (Hons) English",
+          description: "Exploration of medieval times to contemporary culture. Research led teaching.",
+          interests: ["Literary analysis", "Critical research", "Cultural studies"],
+          link: "https://www.lincoln.ac.uk/course/enlenlub/",
+          entryGrades: "96-112"
+        },
+        {
+          name: "BA (Hons) English and Creative Writing",
+          description: "Offering diverse genres, expert workshops and opportunities to build professional portfolios.",
+          interests: ["Creative writing", "Literary analysis", "Cultural perspectives"],
+          link: "https://www.lincoln.ac.uk/course/enlcrwub/",
+          entryGrades: "104-112"
+        },
+        {
+          name: "BA (Hons) English and History",
+          description: "Combining literary and historical analysis across global periods. Developing practical skills in research.",
+          interests: ["Interdisciplinary analysis", "Research + data skills", "Critical thinking"],
+          link: "https://www.lincoln.ac.uk/course/enlhstub/",
+          entryGrades: "104-112"
+        },
+        {
+          name: "BA (Hons) Sound and Music Production",
+          description: "Combining hands on technical training with industry partnerships with opportunities at Abbey Road Studios.",
+          interests: ["Audio engineering", "Creative sound", "Music"],
+          link: "https://www.lincoln.ac.uk/course/medaupub/",
+          entryGrades: "104-112"
+        },
+        {
+          name: "BA (Hons) Dance",
+          description: "Contemporary techniques + choreography with theoretical practice. Opportunity to work with professional companies.",
+          interests: ["Dance", "Performance", "Art"],
+          link: "https://www.lincoln.ac.uk/course/dandanub/",
+          entryGrades: "104-112"
+        },
+        {
+          name: "BA (Hons) Music",
+          description: "Industry oriented education that combines performance, composition across diverse musical styles.",
+          interests: ["Music", "Performance", "Composition"],
+          link: "https://www.lincoln.ac.uk/course/musmusub/",
+          entryGrades: "104-112"
+        },
+        {
+          name: "BA (Hons) Journalism",
+          description: "Industry focused, practical training in print and broadcast news production.",
+          interests: ["Media Studies", "Journalism", "English"],
+          link: "https://www.lincoln.ac.uk/course/joujouub/",
+          entryGrades: "96-104"
+        },
+        {
+          name: "BA (Hons) Journalism Studies",
+          description: "Explore history, societal roles equipping students with knowledge and skills to succeed in a digital landscape.",
+          interests: ["Media studies", "Journalism", "English"],
+          link: "https://www.lincoln.ac.uk/course/jouinvub/",
+          entryGrades: "96-104"
+        },
+        {
+          name: "BA (Hons) Sports Journalism",
+          description: "Trains students in core journalism skills for sports media across various platforms.",
+          interests: ["Sports media", "Journalism", "Media"],
+          link: "https://www.lincoln.ac.uk/course/sptjouub/",
+          entryGrades: "96-104"
+        }
+      ]
+    }
   ]
 };
 

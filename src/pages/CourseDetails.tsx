@@ -1,38 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { IconButton } from "@/components/ui/icon-button";
-import { X, Check, MessageCircle } from "lucide-react";
-
-const courses = [
-  {
-    id: 1,
-    title: "Digital Marketing & Social Media",
-    summary: "Learn to create compelling campaigns and build engaging online communities.",
-    areas: ["Content Strategy", "Analytics", "Brand Development"],
-    skills: ["Creative Thinking", "Data Analysis", "Communication"],
-  },
-  {
-    id: 2,
-    title: "Software Engineering",
-    summary: "Master the art of building scalable applications and innovative solutions.",
-    areas: ["Web Development", "Mobile Apps", "Cloud Computing"],
-    skills: ["Problem Solving", "Coding", "Teamwork"],
-  },
-  {
-    id: 3,
-    title: "Graphic Design",
-    summary: "Develop your creative vision and bring ideas to life through visual storytelling.",
-    areas: ["Branding", "UI/UX Design", "Illustration"],
-    skills: ["Creativity", "Attention to Detail", "Visual Communication"],
-  },
-];
+import { X, Check, MessageCircle, Mail, ExternalLink } from "lucide-react";
+import { EmailCaptureModal } from "@/components/EmailCaptureModal";
+import type { Course } from "@/data/coursesData";
 
 const CourseDetails = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [matchedCourses, setMatchedCourses] = useState<Course[]>([]);
   const navigate = useNavigate();
 
+  // Load matched courses from localStorage
+  useEffect(() => {
+    const storedCourses = localStorage.getItem("matchedCourses");
+    if (storedCourses) {
+      try {
+        const courses = JSON.parse(storedCourses);
+        setMatchedCourses(courses);
+      } catch (error) {
+        console.error("Error loading matched courses:", error);
+        navigate("/matching"); // Redirect if no valid courses
+      }
+    } else {
+      navigate("/matching"); // Redirect if no courses
+    }
+  }, [navigate]);
+
   const handleReject = () => {
-    if (currentIndex < courses.length - 1) {
+    if (currentIndex < matchedCourses.length - 1) {
       setCurrentIndex(currentIndex + 1);
     } else {
       navigate("/matching");
@@ -43,7 +39,15 @@ const CourseDetails = () => {
     navigate("/chat");
   };
 
-  const course = courses[currentIndex];
+  const handleEmailClick = () => {
+    setShowEmailModal(true);
+  };
+
+  if (matchedCourses.length === 0) {
+    return null; // Loading or redirecting
+  }
+
+  const course = matchedCourses[currentIndex];
 
   return (
     <div className="min-h-screen bg-[image:var(--gradient-ocean)] p-6 relative overflow-hidden flex items-center justify-center">
@@ -85,25 +89,73 @@ const CourseDetails = () => {
           </div>
 
           <h2 className="text-3xl font-bold text-white text-center mb-4">
-            {course.title}
+            {course.name}
           </h2>
 
           <div className="bg-[hsl(var(--ocean-deep))]/60 backdrop-blur-sm rounded-2xl p-6 space-y-4">
-            <p className="text-white/90 leading-relaxed">• {course.summary}</p>
-            <p className="text-white/90 leading-relaxed">• Key areas: {course.areas.join(", ")}</p>
-            <p className="text-white/90 leading-relaxed">• Skills developed: {course.skills.join(", ")}</p>
+            <p className="text-white/90 leading-relaxed">• {course.description}</p>
+
+            {course.entryGrades && (
+              <p className="text-white/90 leading-relaxed font-semibold">
+                • Entry Requirements: {course.entryGrades}
+              </p>
+            )}
+
+            {course.interests && course.interests.length > 0 && (
+              <div>
+                <p className="text-white/90 font-semibold mb-2">• Key Interests:</p>
+                <div className="flex flex-wrap gap-2 pl-4">
+                  {course.interests.slice(0, 5).map((interest, i) => (
+                    <span key={i} className="bg-white/20 backdrop-blur-md rounded-full px-3 py-1 text-sm text-white">
+                      {interest}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {course.link && (
+              <a
+                href={course.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-white hover:text-white/80 transition-colors mt-4"
+              >
+                <ExternalLink className="w-4 h-4" />
+                <span className="underline">View Full Course Details</span>
+              </a>
+            )}
           </div>
         </div>
 
-        {/* Questions button */}
-        <button
-          onClick={() => navigate("/chat")}
-          className="w-full mt-6 bg-white/95 backdrop-blur-sm text-[hsl(var(--secondary))] rounded-full py-4 px-6 flex items-center justify-center gap-3 font-bold text-lg shadow-lg hover:bg-white transition-all hover:scale-105"
-        >
-          <MessageCircle className="w-6 h-6" />
-          Any Questions?
-        </button>
+        {/* Action buttons */}
+        <div className="space-y-3 mt-6">
+          {/* Email Me Info Button */}
+          <button
+            onClick={handleEmailClick}
+            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full py-4 px-6 flex items-center justify-center gap-3 font-bold text-lg shadow-lg transition-all hover:scale-105"
+          >
+            <Mail className="w-6 h-6" />
+            Email Me Course Info
+          </button>
+
+          {/* Questions button */}
+          <button
+            onClick={() => navigate("/chat")}
+            className="w-full bg-white/95 backdrop-blur-sm text-[hsl(var(--secondary))] rounded-full py-4 px-6 flex items-center justify-center gap-3 font-bold text-lg shadow-lg hover:bg-white transition-all hover:scale-105"
+          >
+            <MessageCircle className="w-6 h-6" />
+            Any Questions?
+          </button>
+        </div>
       </div>
+
+      {/* Email Capture Modal */}
+      <EmailCaptureModal
+        isOpen={showEmailModal}
+        onClose={() => setShowEmailModal(false)}
+        matchedCourses={[course]}
+      />
     </div>
   );
 };

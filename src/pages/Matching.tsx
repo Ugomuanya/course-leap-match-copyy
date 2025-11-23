@@ -5,12 +5,14 @@ import { Heart, MessageCircle, RotateCcw, ExternalLink, X } from "lucide-react";
 import { getCoursesBySubject, searchCoursesByInterests, type Course } from "@/data/coursesData";
 import TinderCard from "react-tinder-card";
 import { ShareButton } from "@/components/ShareButton";
+import { EmailCaptureModal } from "@/components/EmailCaptureModal";
 
 const Matching = () => {
   const [showResult, setShowResult] = useState(false);
   const [selectedCourses, setSelectedCourses] = useState<Course[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [swipeDirection, setSwipeDirection] = useState<string | null>(null);
+  const [showEmailModal, setShowEmailModal] = useState(false);
   const navigate = useNavigate();
   const subject = localStorage.getItem("selectedSubject") || "Science";
   const name = localStorage.getItem("studentName") || "Student";
@@ -53,6 +55,21 @@ const Matching = () => {
     }, 2000);
     return () => clearTimeout(timer);
   }, []);
+
+  // Show email modal when matching is complete and user has selected courses
+  useEffect(() => {
+    if (currentIndex >= suggestedCourses.length && selectedCourses.length > 0) {
+      // Check if user hasn't already provided email
+      const hasEmail = localStorage.getItem("userEmail");
+      if (!hasEmail) {
+        // Wait 2.5 seconds - let user see success card and celebrate first
+        const timer = setTimeout(() => {
+          setShowEmailModal(true);
+        }, 2500);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [currentIndex, selectedCourses.length, suggestedCourses.length]);
 
   const onSwipe = (direction: string, course: Course) => {
     setSwipeDirection(direction);
@@ -342,6 +359,13 @@ const Matching = () => {
           </div>
         )}
       </div>
+
+      {/* Email Capture Modal */}
+      <EmailCaptureModal
+        isOpen={showEmailModal}
+        onClose={() => setShowEmailModal(false)}
+        matchedCourses={selectedCourses}
+      />
     </div>
   );
 };
