@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Heart, MessageCircle, RotateCcw, ExternalLink, X } from "lucide-react";
 import { getCoursesBySubject, searchCoursesByInterests, type Course } from "@/data/coursesData";
 import TinderCard from "react-tinder-card";
+import { ShareButton } from "@/components/ShareButton";
 
 const Matching = () => {
   const [showResult, setShowResult] = useState(false);
@@ -235,63 +236,111 @@ const Matching = () => {
         )}
 
         {/* Info card */}
-        <div className="bg-[hsl(var(--ocean-medium))]/80 backdrop-blur-md rounded-3xl p-6 mb-6 shadow-[var(--shadow-card)]">
-          <p className="text-white/90 leading-relaxed mb-2">
-            {currentIndex < suggestedCourses.length 
-              ? "Swipe right to match, swipe left to pass. The best way to fall in love is in person - check out our open days!"
-              : "Explore your matches! The best way to fall in love is in person - check out our open days!"
-            }
-          </p>
-          <p className="text-white font-semibold">
-            Or find out more via a chat with our advisor.
-          </p>
-        </div>
+        {currentIndex < suggestedCourses.length && (
+          <div className="bg-[hsl(var(--ocean-medium))]/80 backdrop-blur-md rounded-3xl p-6 mb-6 shadow-[var(--shadow-card)]">
+            <p className="text-white/90 leading-relaxed mb-2">
+              Swipe right to match, swipe left to pass. The best way to fall in love is in person - check out our open days!
+            </p>
+            <p className="text-white font-semibold">
+              Or find out more via a chat with our advisor.
+            </p>
+          </div>
+        )}
 
-        {/* Action buttons */}
-        <div className="space-y-4">
-          {currentIndex < suggestedCourses.length && (
+        {/* Action buttons - WHILE SWIPING */}
+        {currentIndex < suggestedCourses.length && (
+          <div className="space-y-4">
             <Button
               onClick={handleSkipAll}
               size="lg"
               variant="outline"
-              className="w-full text-lg font-bold text-white border-white/30"
+              className="w-full h-14 text-lg font-bold text-white border-white/30 hover:bg-white/10"
             >
               Skip All
             </Button>
-          )}
 
-          {selectedCourses.length > 0 && currentIndex >= suggestedCourses.length && (
             <Button
-              onClick={handleViewCourses}
+              onClick={handleChat}
               size="lg"
-              variant="coral"
-              className="w-full text-lg font-bold animate-in fade-in slide-in-from-bottom-4 duration-500"
+              className="w-full h-14 text-lg font-bold bg-white/20 hover:bg-white/30 backdrop-blur-md text-white border-0"
             >
-              <Heart className="w-5 h-5" />
-              Explore {selectedCourses.length} {selectedCourses.length === 1 ? 'Course' : 'Courses'}
+              <MessageCircle className="w-5 h-5" />
+              Chat with Advisor
             </Button>
-          )}
+          </div>
+        )}
 
-          <Button
-            onClick={handleChat}
-            size="lg"
-            variant="default"
-            className="w-full text-lg font-bold"
-          >
-            <MessageCircle className="w-5 h-5" />
-            Chat with Advisor
-          </Button>
+        {/* Action buttons - AFTER MATCHING */}
+        {currentIndex >= suggestedCourses.length && (
+          <div className="space-y-5 animate-in fade-in slide-in-from-bottom-6 duration-700">
+            {/* Success Message Card */}
+            <div className="bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-md rounded-3xl p-8 mb-4 shadow-[var(--shadow-card)] border border-white/20">
+              <div className="text-center">
+                <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-[hsl(var(--teal-bright))] to-[hsl(var(--accent))] flex items-center justify-center shadow-lg">
+                  <Heart className="w-10 h-10 text-white fill-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-2">
+                  Awesome Choice{selectedCourses.length > 1 ? 's' : ''}! 🎉
+                </h3>
+                <p className="text-white/90 text-lg leading-relaxed">
+                  You matched with {selectedCourses.length} {selectedCourses.length === 1 ? 'course' : 'courses'}.
+                  The best way to fall in love is in person!
+                </p>
+              </div>
+            </div>
 
-          <Button
-            onClick={handleRestart}
-            size="lg"
-            variant="outline"
-            className="w-full text-lg font-bold text-white border-white/30"
-          >
-            <RotateCcw className="w-5 h-5" />
-            Start Over
-          </Button>
-        </div>
+            {/* Primary CTA */}
+            {selectedCourses.length > 0 && (
+              <Button
+                onClick={handleViewCourses}
+                size="lg"
+                className="w-full h-16 text-xl font-bold bg-gradient-to-r from-[hsl(var(--coral))] to-[hsl(var(--coral-light))] hover:opacity-90 shadow-xl"
+              >
+                <Heart className="w-6 h-6" />
+                Explore My {selectedCourses.length} {selectedCourses.length === 1 ? 'Match' : 'Matches'}
+              </Button>
+            )}
+
+            {/* Share Button */}
+            {selectedCourses.length > 0 && (
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000">
+                <ShareButton
+                  courseName={selectedCourses[0]?.name || "My Course Match"}
+                  courseId={selectedCourses[0]?.name.toLowerCase().replace(/\s+/g, '-')}
+                />
+              </div>
+            )}
+
+            {/* Secondary Actions */}
+            <div className="grid grid-cols-2 gap-4">
+              <Button
+                onClick={handleChat}
+                size="lg"
+                className="h-14 text-base font-bold bg-[hsl(var(--teal-bright))] hover:bg-[hsl(var(--teal-bright))]/90"
+              >
+                <MessageCircle className="w-5 h-5" />
+                Chat
+              </Button>
+
+              <Button
+                onClick={handleRestart}
+                size="lg"
+                variant="outline"
+                className="h-14 text-base font-bold text-white border-white/30 hover:bg-white/10"
+              >
+                <RotateCcw className="w-5 h-5" />
+                Start Over
+              </Button>
+            </div>
+
+            {/* Motivational CTA */}
+            <div className="text-center pt-4">
+              <p className="text-white/70 text-sm">
+                Ready to take the next step? Check out our open days! 🏫
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
