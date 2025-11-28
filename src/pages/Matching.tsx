@@ -59,8 +59,9 @@ const Matching = () => {
 
   // Animated loading with progress - only show on first visit
   useEffect(() => {
-    // If already seen loading (checked in initial state), do nothing
-    if (hasSeenLoading) {
+    // If already seen loading, skip animation and show results immediately
+    if (hasSeenLoading === "true") {
+      setShowResult(true);
       return;
     }
 
@@ -85,7 +86,7 @@ const Matching = () => {
       clearTimeout(timer);
       clearInterval(progressInterval);
     };
-  }, [hasSeenLoading]);
+  }, []);
 
   // Show email modal when matching is complete and user has selected courses
   useEffect(() => {
