@@ -69,12 +69,12 @@ const Welcome = () => {
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white leading-tight">
               Find Your Perfect
               <span className="block bg-gradient-to-r from-[#fddb35] via-[#ffd700] to-[#fddb35] bg-clip-text text-transparent animate-pulse">
-                BSc Match
+                Undergraduate Match
               </span>
             </h1>
 
             <p className="text-lg sm:text-xl text-white/80 max-w-xl mx-auto font-medium">
-              Swipe through undergraduate courses, discover your passion, and find the perfect BSc degree for your future.
+              Swipe through undergraduate courses, discover your passion, and find the perfect degree for your future.
             </p>
           </div>
 
