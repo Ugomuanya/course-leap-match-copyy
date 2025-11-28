@@ -1,68 +1,97 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Heart, MessageCircle, RotateCcw, ExternalLink, X } from "lucide-react";
+import { Heart, MessageCircle, RotateCcw, ExternalLink, X, Sparkles, GraduationCap } from "lucide-react";
 import { getCoursesBySubject, searchCoursesByInterests, type Course } from "@/data/coursesData";
 import TinderCard from "react-tinder-card";
 import { ShareButton } from "@/components/ShareButton";
 import { EmailCaptureModal } from "@/components/EmailCaptureModal";
+import { MatchToast } from "@/components/MatchToast";
+import { FirstMatchModal } from "@/components/FirstMatchModal";
+import confetti from "canvas-confetti";
 
 const Matching = () => {
-  const [showResult, setShowResult] = useState(false);
+  // Check if loading has been shown BEFORE initial render to prevent flash
+  const hasSeenLoading = sessionStorage.getItem("matchingLoadingShown");
+
+  const [showResult, setShowResult] = useState(hasSeenLoading === "true");
   const [selectedCourses, setSelectedCourses] = useState<Course[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [swipeDirection, setSwipeDirection] = useState<string | null>(null);
+  const [lastDirection, setLastDirection] = useState<string | null>(null);
   const [showEmailModal, setShowEmailModal] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [showToast, setShowToast] = useState(false);
+  const [toastCourse, setToastCourse] = useState<Course | null>(null);
+  const [showFirstMatchModal, setShowFirstMatchModal] = useState(false);
+  const [firstMatchCourse, setFirstMatchCourse] = useState<Course | null>(null);
   const navigate = useNavigate();
-  const subject = localStorage.getItem("selectedSubject") || "Science";
+  const subject = localStorage.getItem("selectedSubject") || "Business and Management";
   const name = localStorage.getItem("studentName") || "Student";
   const programLevel = localStorage.getItem("programLevel") || "undergraduate";
   const skillAnswers = JSON.parse(localStorage.getItem("skillAnswers") || "[]");
-  
+
   // Filter courses based on program level
   const filterCoursesByLevel = (courses: Course[]) => {
     if (programLevel === "undergraduate") {
-      // Undergraduate: BSc, BEng, BA
-      return courses.filter(course => 
-        course.name.startsWith("BSc") || 
-        course.name.startsWith("BEng") || 
+      return courses.filter(course =>
+        course.name.startsWith("BSc") ||
+        course.name.startsWith("BEng") ||
         course.name.startsWith("BA")
       );
     } else {
-      // Postgraduate: MBio, MComp, MChem, MEng, MSci, MGeog, MSc
-      return courses.filter(course => 
-        course.name.startsWith("M") && 
-        !course.name.startsWith("MA") // Exclude if there are MA courses
+      return courses.filter(course =>
+        course.name.startsWith("M") &&
+        !course.name.startsWith("MA")
       );
     }
   };
-  
+
   // Get course matches based on subject and skills
   const allCourses = filterCoursesByLevel(getCoursesBySubject(subject));
   const matchedByInterests = filterCoursesByLevel(searchCoursesByInterests(subject, skillAnswers));
-  
+
   // Prioritize courses matched by interests, then fill with general subject courses
-  const suggestedCourses = matchedByInterests.length > 0 
+  const suggestedCourses = matchedByInterests.length > 0
     ? matchedByInterests.slice(0, 3)
     : allCourses.slice(0, 3);
 
-  const currentCourse = suggestedCourses[currentIndex];
   const childRefs = useRef<any[]>(suggestedCourses.map(() => React.createRef()));
 
+  // Animated loading with progress - only show on first visit
   useEffect(() => {
+    // If already seen loading (checked in initial state), do nothing
+    if (hasSeenLoading) {
+      return;
+    }
+
+    // First time visiting matching page - show loading animation
+    sessionStorage.setItem("matchingLoadingShown", "true");
+
+    const progressInterval = setInterval(() => {
+      setLoadingProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(progressInterval);
+          return 100;
+        }
+        return prev + 2;
+      });
+    }, 30);
+
     const timer = setTimeout(() => {
       setShowResult(true);
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, []);
+    }, 2500);
+
+    return () => {
+      clearTimeout(timer);
+      clearInterval(progressInterval);
+    };
+  }, [hasSeenLoading]);
 
   // Show email modal when matching is complete and user has selected courses
   useEffect(() => {
     if (currentIndex >= suggestedCourses.length && selectedCourses.length > 0) {
-      // Check if user hasn't already provided email
       const hasEmail = localStorage.getItem("userEmail");
       if (!hasEmail) {
-        // Wait 2.5 seconds - let user see success card and celebrate first
         const timer = setTimeout(() => {
           setShowEmailModal(true);
         }, 2500);
@@ -72,14 +101,96 @@ const Matching = () => {
   }, [currentIndex, selectedCourses.length, suggestedCourses.length]);
 
   const onSwipe = (direction: string, course: Course) => {
-    setSwipeDirection(direction);
+    setLastDirection(direction);
+
     if (direction === 'right') {
+      // Add course to selected
       setSelectedCourses(prev => [...prev, course]);
+
+      // Haptic feedback for mobile devices
+      if ('vibrate' in navigator) {
+        navigator.vibrate(50); // 50ms gentle vibration
+      }
+
+      // Check if this is the first match
+      const isFirstMatch = selectedCourses.length === 0;
+
+      if (isFirstMatch) {
+        // First match - show full celebration modal
+        setFirstMatchCourse(course);
+        setShowFirstMatchModal(true);
+        // Fire confetti
+        fireConfetti();
+      } else {
+        // Subsequent matches - show toast + confetti
+        setToastCourse(course);
+        setShowToast(true);
+        // Fire smaller confetti burst
+        fireConfetti(false);
+      }
     }
+
     setTimeout(() => {
       setCurrentIndex(prev => prev + 1);
-      setSwipeDirection(null);
-    }, 300);
+      setLastDirection(null);
+    }, 600);
+  };
+
+  // Confetti animation function
+  const fireConfetti = (large: boolean = true) => {
+    const colors = ['#cd1f80', '#fddb35', '#ffd700', '#ffffff'];
+
+    if (large) {
+      // Large celebration for first match
+      const duration = 2500;
+      const animationEnd = Date.now() + duration;
+
+      const randomInRange = (min: number, max: number) => {
+        return Math.random() * (max - min) + min;
+      };
+
+      const interval = setInterval(() => {
+        const timeLeft = animationEnd - Date.now();
+
+        if (timeLeft <= 0) {
+          return clearInterval(interval);
+        }
+
+        const particleCount = 50;
+
+        confetti({
+          particleCount,
+          startVelocity: 30,
+          spread: 360,
+          ticks: 60,
+          origin: {
+            x: randomInRange(0.1, 0.3),
+            y: Math.random() - 0.2
+          },
+          colors: colors
+        });
+
+        confetti({
+          particleCount,
+          startVelocity: 30,
+          spread: 360,
+          ticks: 60,
+          origin: {
+            x: randomInRange(0.7, 0.9),
+            y: Math.random() - 0.2
+          },
+          colors: colors
+        });
+      }, 250);
+    } else {
+      // Quick burst for subsequent matches
+      confetti({
+        particleCount: 50,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: colors
+      });
+    }
   };
 
   const swipe = async (dir: string) => {
@@ -105,217 +216,334 @@ const Matching = () => {
 
   const handleRestart = () => {
     localStorage.clear();
+    sessionStorage.clear(); // Clear session storage to show loading animation on restart
     navigate("/");
   };
 
+  // Loading State with Modern Animation
   if (!showResult) {
     return (
-      <div className="min-h-screen bg-[image:var(--gradient-ocean)] flex items-center justify-center p-6">
-        <div className="text-center">
-          <div className="w-32 h-32 mx-auto mb-8 relative">
-            <div className="absolute inset-0 rounded-full bg-[hsl(var(--coral))] opacity-50 animate-ping"></div>
-            <div className="absolute inset-0 rounded-full bg-[hsl(var(--teal-bright))] opacity-50 animate-ping delay-300"></div>
-            <Heart className="w-32 h-32 text-white animate-pulse" />
+      <div className="min-h-screen bg-gradient-to-br from-[#cd1f80] via-[#a01866] to-[#1a0a2e] flex items-center justify-center p-6 relative overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-10 w-96 h-96 bg-[#fddb35] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#cd1f80] rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse delay-700"></div>
+        </div>
+
+        <div className="text-center relative z-10 max-w-md w-full">
+          {/* Animated Icon Stack */}
+          <div className="relative w-40 h-40 mx-auto mb-8">
+            {/* Rotating Background Circle */}
+            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#fddb35] to-[#ffd700] opacity-20 animate-spin" style={{ animationDuration: '3s' }}></div>
+
+            {/* Pulsing Rings */}
+            <div className="absolute inset-0 rounded-full border-4 border-[#fddb35] opacity-40 animate-ping"></div>
+            <div className="absolute inset-4 rounded-full border-4 border-white opacity-30 animate-ping" style={{ animationDelay: '0.5s' }}></div>
+
+            {/* Center Icons */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="relative">
+                <GraduationCap className="w-20 h-20 text-[#fddb35] animate-bounce" />
+                <Sparkles className="w-8 h-8 text-white absolute -top-2 -right-2 animate-pulse" />
+              </div>
+            </div>
           </div>
-          <h2 className="text-3xl font-bold text-white">Finding your perfect match...</h2>
+
+          {/* Loading Text */}
+          <h2 className="text-3xl sm:text-4xl font-black text-white mb-4 animate-pulse">
+            Finding your perfect match...
+          </h2>
+          <p className="text-base sm:text-lg text-white/80 mb-6">
+            Analyzing your preferences & matching courses
+          </p>
+
+          {/* Progress Bar */}
+          <div className="w-full max-w-xs mx-auto">
+            <div className="h-3 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm shadow-inner">
+              <div
+                className="h-full bg-gradient-to-r from-[#fddb35] via-[#ffd700] to-[#fddb35] transition-all duration-300 ease-out relative"
+                style={{ width: `${loadingProgress}%` }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-pulse"></div>
+              </div>
+            </div>
+            <p className="text-white/60 text-sm mt-2">{loadingProgress}%</p>
+          </div>
+
+          {/* Fun Facts */}
+          <div className="mt-8 bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
+            <p className="text-white/90 text-sm italic">
+              "University of Lincoln has over 150+ undergraduate courses across 8 schools!"
+            </p>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[image:var(--gradient-ocean)] p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-[#cd1f80] via-[#a01866] to-[#1a0a2e] p-4 sm:p-6 relative overflow-hidden">
+      {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-80 h-80 bg-[hsl(var(--lavender))] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-80 h-80 bg-[hsl(var(--teal-bright))] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse delay-700"></div>
+        <div className="absolute top-20 left-10 w-64 h-64 sm:w-80 sm:h-80 bg-[#fddb35] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-64 h-64 sm:w-80 sm:h-80 bg-[#cd1f80] rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse delay-700"></div>
       </div>
 
-      <div className="max-w-2xl mx-auto relative z-10 pt-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-3">
-            Congrats {name}! 🎉
-          </h1>
-          <p className="text-xl text-white/90">
-            We found you {suggestedCourses.length} perfect {suggestedCourses.length === 1 ? 'match' : 'matches'}!
-          </p>
-          <p className="text-sm text-white/70 mt-2">
-            {currentIndex < suggestedCourses.length 
-              ? `${currentIndex + 1} of ${suggestedCourses.length}`
-              : 'All done!'}
-          </p>
+      <div className="max-w-2xl mx-auto relative z-10 pt-6 sm:pt-10 pb-6">
+        {/* Progress Indicator - Step 3 of 3 */}
+        <div className="flex items-center justify-center gap-2 mb-6">
+          <div className="w-8 h-1 bg-[#fddb35] rounded-full"></div>
+          <div className="w-8 h-1 bg-[#fddb35] rounded-full"></div>
+          <div className="w-8 h-1 bg-[#fddb35] rounded-full"></div>
         </div>
 
-        {/* Swipeable course cards */}
-        <div className="relative w-full max-w-sm mx-auto mb-8" style={{ height: '600px' }}>
+        {/* Header */}
+        <div className="text-center mb-6 sm:mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-2 leading-tight">
+            {currentIndex < suggestedCourses.length ? (
+              <>Your Perfect Matches!</>
+            ) : (
+              <>All Done, {name}! 🎉</>
+            )}
+          </h1>
+          <p className="text-sm sm:text-base md:text-lg text-white/90">
+            {currentIndex < suggestedCourses.length ? (
+              <>Swipe right to match, left to pass</>
+            ) : (
+              <>You've reviewed all courses</>
+            )}
+          </p>
+          {currentIndex < suggestedCourses.length && (
+            <div className="inline-flex items-center gap-2 bg-[#fddb35]/20 backdrop-blur-md px-4 py-1.5 rounded-full border border-[#fddb35]/30 mt-3">
+              <span className="text-[#fddb35] text-sm font-bold">
+                {currentIndex + 1} of {suggestedCourses.length}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Card Stack Container */}
+        <div className="relative w-full max-w-md mx-auto mb-6 sm:mb-8" style={{ height: 'clamp(550px, 75vh, 650px)' }}>
           {currentIndex >= suggestedCourses.length ? (
+            // Completion State
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center space-y-4 animate-in fade-in slide-in-from-bottom-4">
-                <div className="w-24 h-24 mx-auto rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center">
-                  <Heart className="w-12 h-12 text-white fill-white" />
+              <div className="text-center space-y-6 animate-in fade-in zoom-in duration-700">
+                <div className="relative w-32 h-32 mx-auto">
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#fddb35] to-[#ffd700] animate-pulse"></div>
+                  <div className="absolute inset-2 rounded-full bg-white flex items-center justify-center">
+                    <Heart className="w-16 h-16 text-[#cd1f80] fill-[#cd1f80] animate-bounce" />
+                  </div>
                 </div>
-                <h3 className="text-2xl font-bold text-white">All courses reviewed!</h3>
-                <p className="text-white/80">
-                  You selected {selectedCourses.length} {selectedCourses.length === 1 ? 'course' : 'courses'}
-                </p>
+                <div>
+                  <h3 className="text-2xl sm:text-3xl font-black text-white mb-2">
+                    All courses reviewed!
+                  </h3>
+                  <p className="text-white/90 text-base sm:text-lg">
+                    You matched with <span className="text-[#fddb35] font-bold">{selectedCourses.length}</span> {selectedCourses.length === 1 ? 'course' : 'courses'}
+                  </p>
+                </div>
               </div>
             </div>
           ) : (
-            <>
-              {suggestedCourses.map((course, index) => (
-                index === currentIndex && (
+            // Swipeable Card Stack
+            <div className="relative w-full h-full">
+              {/* Background Stack Effect - Show next cards underneath */}
+              {suggestedCourses.map((_, index) => {
+                if (index < currentIndex) return null;
+                if (index > currentIndex + 2) return null;
+
+                const offset = index - currentIndex;
+                const scale = 1 - (offset * 0.05);
+                const yOffset = offset * 10;
+                const opacity = 1 - (offset * 0.3);
+
+                return (
+                  <div
+                    key={`bg-${index}`}
+                    className="absolute inset-0 transition-all duration-300 ease-out pointer-events-none"
+                    style={{
+                      transform: `translateY(${yOffset}px) scale(${scale})`,
+                      opacity: opacity,
+                      zIndex: 10 - offset,
+                    }}
+                  >
+                    <div className="w-full h-full rounded-[2rem] sm:rounded-[2.5rem] bg-gradient-to-br from-white/10 to-white/5 border-2 border-white/20 shadow-2xl"></div>
+                  </div>
+                );
+              })}
+
+              {/* Active Swipeable Card */}
+              {suggestedCourses.map((course, index) => {
+                if (index !== currentIndex) return null;
+
+                return (
                   <TinderCard
                     ref={childRefs.current[index]}
                     key={course.name}
                     onSwipe={(dir) => onSwipe(dir, course)}
                     preventSwipe={['up', 'down']}
-                    className="absolute w-full"
+                    className="absolute inset-0"
+                    swipeRequirementType="position"
+                    swipeThreshold={100}
+                    flickOnSwipe={true}
                   >
-                    <div className="w-full aspect-[3/4] rounded-[2.5rem] relative overflow-hidden shadow-2xl">
-                      {/* Card background gradient */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--ocean-medium))] to-[hsl(var(--ocean-deep))]" />
-                      
-                      {/* Overlay pattern */}
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(255,255,255,0.1),transparent)]" />
-                      
-                      {/* Swipe indicators */}
-                      {swipeDirection === 'right' && (
-                        <div className="absolute top-12 right-12 z-10 animate-in zoom-in">
-                          <div className="w-24 h-24 rounded-full bg-[hsl(var(--teal-bright))] flex items-center justify-center rotate-12 border-4 border-white">
-                            <Heart className="w-12 h-12 text-white fill-white" />
+                    <div className="w-full h-full rounded-[2rem] sm:rounded-[2.5rem] relative overflow-hidden shadow-2xl group cursor-grab active:cursor-grabbing">
+                      {/* Card Gradient Background */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#1a0a2e] via-[#2d1b3d] to-[#1a0a2e]"></div>
+
+                      {/* Overlay Pattern */}
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(253,219,53,0.1),transparent)]"></div>
+
+                      {/* Like/Nope Overlays */}
+                      <div className="absolute inset-0 flex items-start justify-between p-8 sm:p-12 pointer-events-none z-20">
+                        {/* NOPE - Left */}
+                        <div className="transform -rotate-12 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                          <div className="px-6 py-3 border-4 border-red-500 rounded-2xl">
+                            <span className="text-red-500 font-black text-3xl sm:text-4xl">NOPE</span>
                           </div>
                         </div>
-                      )}
-                      {swipeDirection === 'left' && (
-                        <div className="absolute top-12 left-12 z-10 animate-in zoom-in">
-                          <div className="w-24 h-24 rounded-full bg-[hsl(var(--coral))] flex items-center justify-center -rotate-12 border-4 border-white">
-                            <X className="w-12 h-12 text-white stroke-[3]" />
+
+                        {/* LIKE - Right */}
+                        <div className="transform rotate-12 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                          <div className="px-6 py-3 border-4 border-[#00ff00] rounded-2xl">
+                            <span className="text-[#00ff00] font-black text-3xl sm:text-4xl">LIKE</span>
                           </div>
                         </div>
-                      )}
-                      
-                      {/* Content */}
-                      <div className="relative h-full flex flex-col justify-between p-8 text-white">
-                        <div className="text-center space-y-3">
-                          <h3 className="text-3xl font-bold drop-shadow-lg leading-tight">{course.name}</h3>
+                      </div>
+
+                      {/* Card Content */}
+                      <div className="relative h-full flex flex-col justify-between p-6 sm:p-8 text-white z-10">
+                        {/* Top Section - Course Title */}
+                        <div className="space-y-3">
+                          <div className="inline-flex items-center gap-2 bg-[#fddb35]/30 px-3 py-1 rounded-full border border-[#fddb35]/50">
+                            <GraduationCap className="w-4 h-4 text-[#fddb35]" />
+                            <span className="text-[#fddb35] text-xs sm:text-sm font-bold">University of Lincoln</span>
+                          </div>
+                          <h3 className="text-2xl sm:text-3xl md:text-4xl font-black text-white drop-shadow-lg leading-tight">
+                            {course.name}
+                          </h3>
                         </div>
-                        
-                        <div className="text-center space-y-3">
-                          <p className="text-sm text-white/90 line-clamp-4 px-2 leading-relaxed">{course.description}</p>
-                          <div className="flex flex-wrap gap-2 justify-center">
-                            {course.interests.slice(0, 3).map((interest, i) => (
-                              <div key={i} className="inline-block bg-white/20 backdrop-blur-md rounded-full px-4 py-1.5">
-                                <p className="text-xs font-semibold">{interest}</p>
+
+                        {/* Bottom Section - Course Details */}
+                        <div className="space-y-4">
+                          <p className="text-sm sm:text-base text-white/90 leading-relaxed line-clamp-3">
+                            {course.description}
+                          </p>
+
+                          {/* Interest Tags */}
+                          <div className="flex flex-wrap gap-2">
+                            {course.interests.slice(0, 4).map((interest, i) => (
+                              <div key={i} className="bg-white/25 rounded-full px-3 py-1 border border-white/40">
+                                <p className="text-xs sm:text-sm font-semibold">{interest}</p>
                               </div>
                             ))}
                           </div>
+
+                          {/* Entry Requirements */}
                           {course.entryGrades && (
-                            <div className="inline-block bg-white/30 backdrop-blur-md rounded-full px-4 py-1.5">
-                              <p className="text-sm font-bold">Entry: {course.entryGrades}</p>
+                            <div className="inline-flex items-center gap-2 bg-[#cd1f80]/40 rounded-full px-4 py-2 border border-[#cd1f80]/60">
+                              <Sparkles className="w-4 h-4 text-[#fddb35]" />
+                              <p className="text-sm sm:text-base font-bold">Entry: {course.entryGrades} UCAS points</p>
                             </div>
                           )}
+
+                          {/* View Details Link */}
                           {course.link && (
                             <a
                               href={course.link}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-full px-5 py-2 transition-all duration-300 mt-2"
+                              onClick={(e) => e.stopPropagation()}
+                              className="inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 active:bg-white/35 rounded-full px-4 py-2 border border-white/40 transition-all duration-300 group"
                             >
-                              <span className="text-sm font-semibold">View Details</span>
-                              <ExternalLink className="w-4 h-4" />
+                              <span className="text-sm sm:text-base font-semibold">View Full Details</span>
+                              <ExternalLink className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                             </a>
                           )}
                         </div>
                       </div>
                     </div>
                   </TinderCard>
-                )
-              ))}
-            </>
+                );
+              })}
+            </div>
           )}
         </div>
 
-        {/* Swipe action buttons */}
+        {/* Swipe Action Buttons */}
         {currentIndex < suggestedCourses.length && (
-          <div className="flex justify-center gap-6 mb-8">
+          <div className="flex justify-center items-center gap-4 sm:gap-6 mb-6 sm:mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            {/* Pass Button */}
             <button
               onClick={() => swipe('left')}
-              className="w-16 h-16 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
+              className="group relative w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/15 hover:bg-red-500/20 active:scale-90 border-2 border-white/40 hover:border-red-500 flex items-center justify-center transition-all duration-300 shadow-xl"
+              aria-label="Pass on this course"
             >
-              <X className="w-8 h-8 text-white stroke-[3]" />
+              <X className="w-8 h-8 sm:w-10 sm:h-10 text-white group-hover:text-red-500 transition-colors stroke-[3]" />
             </button>
+
+            {/* Info Button */}
+            <button
+              onClick={handleChat}
+              className="group relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white/15 hover:bg-white/25 active:scale-90 border-2 border-white/40 flex items-center justify-center transition-all duration-300"
+              aria-label="Chat with advisor"
+            >
+              <MessageCircle className="w-6 h-6 sm:w-7 sm:h-7 text-white transition-colors" />
+            </button>
+
+            {/* Like Button */}
             <button
               onClick={() => swipe('right')}
-              className="w-16 h-16 rounded-full bg-[hsl(var(--teal-bright))] hover:bg-[hsl(var(--teal-bright))]/90 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 shadow-[var(--shadow-glow)]"
+              className="group relative w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-[#fddb35] to-[#ffd700] hover:from-[#ffd700] hover:to-[#fddb35] active:scale-90 flex items-center justify-center transition-all duration-300 shadow-2xl hover:shadow-[0_0_30px_rgba(253,219,53,0.5)]"
+              aria-label="Like this course"
             >
-              <Heart className="w-8 h-8 text-white fill-white" />
+              <Heart className="w-8 h-8 sm:w-10 sm:h-10 text-[#cd1f80] fill-[#cd1f80] group-hover:scale-110 transition-transform" />
             </button>
           </div>
         )}
 
-        {/* Info card */}
+        {/* Helper Text for Active Swiping */}
         {currentIndex < suggestedCourses.length && (
-          <div className="bg-[hsl(var(--ocean-medium))]/80 backdrop-blur-md rounded-3xl p-6 mb-6 shadow-[var(--shadow-card)]">
-            <p className="text-white/90 leading-relaxed mb-2">
-              Swipe right to match, swipe left to pass. The best way to fall in love is in person - check out our open days!
-            </p>
-            <p className="text-white font-semibold">
-              Or find out more via a chat with our advisor.
+          <div className="bg-white/15 rounded-2xl sm:rounded-3xl p-4 sm:p-5 mb-4 border border-white/30 shadow-lg animate-in fade-in duration-700">
+            <p className="text-sm sm:text-base text-white/90 text-center leading-relaxed">
+              <span className="font-bold text-[#fddb35]">Pro tip:</span> Drag the card or use the buttons below!
             </p>
           </div>
         )}
 
-        {/* Action buttons - WHILE SWIPING */}
+        {/* Action Buttons - WHILE SWIPING */}
         {currentIndex < suggestedCourses.length && (
-          <div className="space-y-4">
-            <Button
+          <div className="space-y-3">
+            <button
               onClick={handleSkipAll}
-              size="lg"
-              variant="outline"
-              className="w-full h-14 text-lg font-bold text-white border-white/30 hover:bg-white/10"
+              className="w-full h-12 sm:h-14 px-6 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base bg-white/15 hover:bg-white/25 active:bg-white/35 text-white border-2 border-white/40 hover:border-white/50 transition-all duration-300 shadow-lg active:scale-95"
             >
-              Skip All
-            </Button>
-
-            <Button
-              onClick={handleChat}
-              size="lg"
-              className="w-full h-14 text-lg font-bold bg-white/20 hover:bg-white/30 backdrop-blur-md text-white border-0"
-            >
-              <MessageCircle className="w-5 h-5" />
-              Chat with Advisor
-            </Button>
+              Skip All Courses
+            </button>
           </div>
         )}
 
-        {/* Action buttons - AFTER MATCHING */}
+        {/* Action Buttons - AFTER MATCHING */}
         {currentIndex >= suggestedCourses.length && (
-          <div className="space-y-5 animate-in fade-in slide-in-from-bottom-6 duration-700">
-            {/* Success Message Card */}
-            <div className="bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-md rounded-3xl p-8 mb-4 shadow-[var(--shadow-card)] border border-white/20">
-              <div className="text-center">
-                <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-[hsl(var(--teal-bright))] to-[hsl(var(--accent))] flex items-center justify-center shadow-lg">
-                  <Heart className="w-10 h-10 text-white fill-white" />
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-2">
-                  Awesome Choice{selectedCourses.length > 1 ? 's' : ''}! 🎉
-                </h3>
-                <p className="text-white/90 text-lg leading-relaxed">
-                  You matched with {selectedCourses.length} {selectedCourses.length === 1 ? 'course' : 'courses'}.
-                  The best way to fall in love is in person!
+          <div className="space-y-4 animate-in fade-in slide-in-from-bottom-6 duration-700">
+            {/* Primary CTA */}
+            {selectedCourses.length > 0 ? (
+              <div className="relative group">
+                <div className="absolute inset-0 bg-gradient-to-r from-[#fddb35] to-[#ffd700] rounded-xl sm:rounded-2xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity duration-300"></div>
+                <button
+                  onClick={handleViewCourses}
+                  className="relative w-full h-14 sm:h-16 px-6 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg md:text-xl bg-gradient-to-r from-[#cd1f80] to-[#a01866] hover:from-[#a01866] hover:to-[#cd1f80] text-white shadow-2xl hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-2 active:scale-95"
+                >
+                  <Heart className="w-5 h-5 sm:w-6 sm:h-6 fill-white" />
+                  <span>Explore My {selectedCourses.length} {selectedCourses.length === 1 ? 'Match' : 'Matches'}</span>
+                </button>
+              </div>
+            ) : (
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+                <p className="text-white/90 text-center">
+                  No courses selected. Try swiping right to match!
                 </p>
               </div>
-            </div>
-
-            {/* Primary CTA */}
-            {selectedCourses.length > 0 && (
-              <Button
-                onClick={handleViewCourses}
-                size="lg"
-                className="w-full h-16 text-xl font-bold bg-gradient-to-r from-[hsl(var(--coral))] to-[hsl(var(--coral-light))] hover:opacity-90 shadow-xl"
-              >
-                <Heart className="w-6 h-6" />
-                Explore My {selectedCourses.length} {selectedCourses.length === 1 ? 'Match' : 'Matches'}
-              </Button>
             )}
 
             {/* Share Button */}
@@ -329,32 +557,22 @@ const Matching = () => {
             )}
 
             {/* Secondary Actions */}
-            <div className="grid grid-cols-2 gap-4">
-              <Button
+            <div className="grid grid-cols-2 gap-3">
+              <button
                 onClick={handleChat}
-                size="lg"
-                className="h-14 text-base font-bold bg-[hsl(var(--teal-bright))] hover:bg-[hsl(var(--teal-bright))]/90"
+                className="h-12 sm:h-14 px-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base bg-[#fddb35] hover:bg-[#ffd700] text-[#1a0a2e] shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 active:scale-95"
               >
-                <MessageCircle className="w-5 h-5" />
-                Chat
-              </Button>
+                <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span>Chat</span>
+              </button>
 
-              <Button
+              <button
                 onClick={handleRestart}
-                size="lg"
-                variant="outline"
-                className="h-14 text-base font-bold text-white border-white/30 hover:bg-white/10"
+                className="h-12 sm:h-14 px-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base bg-white/15 hover:bg-white/25 active:bg-white/35 text-white border-2 border-white/40 hover:border-white/50 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg active:scale-95"
               >
-                <RotateCcw className="w-5 h-5" />
-                Start Over
-              </Button>
-            </div>
-
-            {/* Motivational CTA */}
-            <div className="text-center pt-4">
-              <p className="text-white/70 text-sm">
-                Ready to take the next step? Check out our open days! 🏫
-              </p>
+                <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span>Restart</span>
+              </button>
             </div>
           </div>
         )}
@@ -366,6 +584,24 @@ const Matching = () => {
         onClose={() => setShowEmailModal(false)}
         matchedCourses={selectedCourses}
       />
+
+      {/* Toast Notification for Subsequent Matches */}
+      {showToast && toastCourse && (
+        <MatchToast
+          message="Course Added!"
+          courseName={toastCourse.name}
+          onClose={() => setShowToast(false)}
+          duration={2000}
+        />
+      )}
+
+      {/* First Match Celebration Modal */}
+      {showFirstMatchModal && firstMatchCourse && (
+        <FirstMatchModal
+          course={firstMatchCourse}
+          onContinue={() => setShowFirstMatchModal(false)}
+        />
+      )}
     </div>
   );
 };

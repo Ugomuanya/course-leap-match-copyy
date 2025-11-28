@@ -1,1 +1,8 @@
 node_modules
+.vercel
+claude.md
+.claude/
+*.log
+dist/
+.env
+.env.local
