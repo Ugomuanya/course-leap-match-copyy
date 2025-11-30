@@ -26,18 +26,21 @@ const Chat = () => {
     scrollToBottom();
   }, [messages]);
 
-  // Prevent viewport resize on mobile keyboard open
+  // Scroll to bottom on focus (mobile keyboard)
   useEffect(() => {
-    // Set viewport height CSS variable
-    const setVh = () => {
-      const vh = window.innerHeight * 0.01;
-      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    const handleFocus = () => {
+      setTimeout(() => {
+        scrollToBottom();
+        // Ensure input is in view
+        inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100);
     };
 
-    setVh();
-    window.addEventListener('resize', setVh);
-
-    return () => window.removeEventListener('resize', setVh);
+    const input = inputRef.current;
+    if (input) {
+      input.addEventListener('focus', handleFocus);
+      return () => input.removeEventListener('focus', handleFocus);
+    }
   }, []);
 
   const handleSend = () => {
@@ -105,7 +108,7 @@ const Chat = () => {
   ];
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-[#cd1f80] via-[#a01866] to-[#1a0a2e] flex flex-col overflow-hidden" style={{ height: 'calc(var(--vh, 1vh) * 100)' }}>
+    <div className="h-screen w-full bg-gradient-to-br from-[#cd1f80] via-[#a01866] to-[#1a0a2e] flex flex-col overflow-hidden">
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-64 h-64 sm:w-80 sm:h-80 bg-[#fddb35] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
@@ -148,8 +151,8 @@ const Chat = () => {
       </div>
 
       {/* Messages Container - Scrollable */}
-      <div className="relative z-10 flex-1 overflow-y-auto">
-        <div className="max-w-4xl mx-auto px-3 py-4 sm:px-4 sm:py-5 space-y-4">
+      <div className="relative z-10 flex-1 overflow-y-auto overflow-x-hidden">
+        <div className="max-w-4xl mx-auto px-3 py-4 sm:px-4 sm:py-5 pb-6 space-y-4">
           {messages.map((message, index) => (
             <div
               key={index}
@@ -229,7 +232,7 @@ const Chat = () => {
       </div>
 
       {/* Input Area - Fixed at Bottom */}
-      <div className="relative z-10 flex-shrink-0 border-t border-white/10 bg-gradient-to-r from-[#1a0a2e]/90 to-[#2d1b3d]/90 backdrop-blur-sm">
+      <div className="relative z-10 flex-shrink-0 border-t border-white/10 bg-gradient-to-r from-[#1a0a2e]/90 to-[#2d1b3d]/90 backdrop-blur-sm" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
         <div className="max-w-4xl mx-auto px-3 py-3 sm:px-4 sm:py-4">
           <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-2 border border-white/30 shadow-lg">
             <div className="flex items-center gap-2">
