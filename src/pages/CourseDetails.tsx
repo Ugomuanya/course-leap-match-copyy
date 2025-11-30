@@ -12,8 +12,13 @@ import {
   Calendar,
   BookOpen,
   ArrowRight,
-  Download,
-  Mail
+  Mail,
+  Briefcase,
+  TrendingUp,
+  ChevronDown,
+  ChevronUp,
+  Play,
+  Users
 } from "lucide-react";
 import { EmailCaptureModal } from "@/components/EmailCaptureModal";
 import { ShareButton } from "@/components/ShareButton";
@@ -23,6 +28,7 @@ const CourseDetails = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [matchedCourses, setMatchedCourses] = useState<Course[]>([]);
+  const [showCourseStructure, setShowCourseStructure] = useState(false);
   const navigate = useNavigate();
 
   // Load matched courses from localStorage
@@ -34,10 +40,10 @@ const CourseDetails = () => {
         setMatchedCourses(courses);
       } catch (error) {
         console.error("Error loading matched courses:", error);
-        navigate("/matching"); // Redirect if no valid courses
+        navigate("/matching");
       }
     } else {
-      navigate("/matching"); // Redirect if no courses
+      navigate("/matching");
     }
   }, [navigate]);
 
@@ -73,7 +79,7 @@ const CourseDetails = () => {
   };
 
   if (matchedCourses.length === 0) {
-    return null; // Loading or redirecting
+    return null;
   }
 
   const course = matchedCourses[currentIndex];
@@ -88,7 +94,7 @@ const CourseDetails = () => {
       </div>
 
       <div className="relative z-10 min-h-screen p-4 sm:p-6 pb-8">
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           {/* Back Button */}
           <button
             onClick={handleBackToMatching}
@@ -96,40 +102,35 @@ const CourseDetails = () => {
             aria-label="Back to matching"
           >
             <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-            <span className="text-sm sm:text-base font-medium">Back to Matching</span>
+            <span className="text-sm sm:text-base font-medium">Back</span>
           </button>
 
           {/* Celebration Header */}
-          <div className="text-center mb-6 sm:mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-[#fddb35] to-[#ffd700] mb-4 animate-bounce">
-              <Heart className="w-8 h-8 sm:w-10 sm:h-10 text-[#cd1f80] fill-[#cd1f80]" />
+          <div className="text-center mb-8 sm:mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-[#fddb35] to-[#ffd700] mb-4 shadow-2xl">
+              <Heart className="w-10 h-10 sm:w-12 sm:h-12 text-[#cd1f80] fill-[#cd1f80]" />
             </div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-2">
-              You Matched With This Course! 🎓
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-3">
+              Your Perfect Match! 🎓
             </h1>
-            <p className="text-white/80 text-sm sm:text-base">
-              {matchedCourses.length === 1 ? (
-                "Here's your perfect match"
-              ) : (
-                <>
-                  Viewing <span className="text-[#fddb35] font-bold">{currentIndex + 1}</span> of{" "}
-                  <span className="text-[#fddb35] font-bold">{matchedCourses.length}</span> matched courses
-                </>
-              )}
-            </p>
+            {matchedCourses.length > 1 && (
+              <p className="text-white/70 text-sm sm:text-base">
+                Course {currentIndex + 1} of {matchedCourses.length}
+              </p>
+            )}
           </div>
 
           {/* Navigation Dots */}
           {matchedCourses.length > 1 && (
-            <div className="flex justify-center gap-2 mb-6">
+            <div className="flex justify-center gap-2 mb-8">
               {matchedCourses.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentIndex(index)}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  className={`h-2 rounded-full transition-all duration-300 ${
                     index === currentIndex
                       ? "bg-[#fddb35] w-8"
-                      : "bg-white/30 hover:bg-white/50"
+                      : "bg-white/30 w-2 hover:bg-white/50"
                   }`}
                   aria-label={`Go to course ${index + 1}`}
                 />
@@ -137,80 +138,67 @@ const CourseDetails = () => {
             </div>
           )}
 
-          {/* Course Card */}
-          <div className="bg-gradient-to-br from-white/10 to-white/5 border-2 border-white/20 rounded-3xl p-6 sm:p-8 shadow-2xl mb-6 animate-in fade-in zoom-in duration-500">
-            {/* University Badge */}
-            <div className="flex justify-center mb-4">
-              <div className="inline-flex items-center gap-2 bg-[#fddb35]/20 px-4 py-2 rounded-full border border-[#fddb35]/30">
-                <GraduationCap className="w-4 h-4 text-[#fddb35]" />
-                <span className="text-[#fddb35] text-xs sm:text-sm font-bold">University of Lincoln</span>
+          {/* Main Content Card */}
+          <div className="bg-white/5 backdrop-blur-md border border-white/20 rounded-3xl shadow-2xl mb-8 overflow-hidden">
+            {/* Course Header */}
+            <div className="bg-gradient-to-br from-white/10 to-transparent p-6 sm:p-8 border-b border-white/10">
+              {/* University Badge */}
+              <div className="flex justify-center mb-6">
+                <div className="inline-flex items-center gap-2 bg-[#fddb35]/20 px-4 py-2 rounded-full border border-[#fddb35]/40">
+                  <GraduationCap className="w-4 h-4 text-[#fddb35]" />
+                  <span className="text-[#fddb35] text-xs sm:text-sm font-bold">University of Lincoln</span>
+                </div>
+              </div>
+
+              {/* Course Name */}
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white text-center mb-4 leading-tight">
+                {course.name}
+              </h2>
+
+              {/* Quick Stats */}
+              <div className="flex flex-wrap justify-center gap-4 mt-6">
+                <div className="flex items-center gap-2 text-white/80 text-sm">
+                  <Calendar className="w-4 h-4 text-[#fddb35]" />
+                  <span>3 years</span>
+                </div>
+                <div className="flex items-center gap-2 text-white/80 text-sm">
+                  <BookOpen className="w-4 h-4 text-[#fddb35]" />
+                  <span>Undergraduate</span>
+                </div>
+                {course.entryGrades && (
+                  <div className="flex items-center gap-2 text-white/80 text-sm">
+                    <Sparkles className="w-4 h-4 text-[#fddb35]" />
+                    <span>{course.entryGrades} UCAS points</span>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Course Icon */}
-            <div className="w-24 h-24 sm:w-32 sm:h-32 mx-auto mb-6 rounded-full bg-gradient-to-br from-[#fddb35] to-[#ffd700] flex items-center justify-center shadow-2xl">
-              <GraduationCap className="w-12 h-12 sm:w-16 sm:h-16 text-[#1a0a2e]" />
-            </div>
-
-            {/* Course Name */}
-            <h2 className="text-2xl sm:text-3xl font-black text-white text-center mb-6 leading-tight">
-              {course.name}
-            </h2>
-
-            {/* Course Information */}
-            <div className="space-y-4 sm:space-y-5">
+            {/* Course Content */}
+            <div className="p-6 sm:p-8 space-y-6">
               {/* Description */}
-              <div className="bg-white/10 rounded-2xl p-4 sm:p-5 border border-white/20">
-                <div className="flex items-start gap-3 mb-2">
-                  <BookOpen className="w-5 h-5 text-[#fddb35] flex-shrink-0 mt-0.5" />
-                  <h3 className="text-white font-bold text-base sm:text-lg">Course Overview</h3>
-                </div>
-                <p className="text-white/90 text-sm sm:text-base leading-relaxed pl-8">
+              <div>
+                <h3 className="text-white font-bold text-lg sm:text-xl mb-3 flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-[#fddb35]" />
+                  Overview
+                </h3>
+                <p className="text-white/80 text-sm sm:text-base leading-relaxed">
                   {course.description}
                 </p>
               </div>
 
-              {/* Entry Requirements */}
-              {course.entryGrades && (
-                <div className="bg-white/10 rounded-2xl p-4 sm:p-5 border border-white/20">
-                  <div className="flex items-start gap-3 mb-2">
-                    <Sparkles className="w-5 h-5 text-[#fddb35] flex-shrink-0 mt-0.5" />
-                    <h3 className="text-white font-bold text-base sm:text-lg">Entry Requirements</h3>
-                  </div>
-                  <p className="text-white/90 text-sm sm:text-base font-semibold pl-8">
-                    {course.entryGrades} UCAS points
-                  </p>
-                </div>
-              )}
-
-              {/* Duration & Type */}
-              <div className="bg-white/10 rounded-2xl p-4 sm:p-5 border border-white/20">
-                <div className="flex items-start gap-3 mb-2">
-                  <Calendar className="w-5 h-5 text-[#fddb35] flex-shrink-0 mt-0.5" />
-                  <h3 className="text-white font-bold text-base sm:text-lg">Course Details</h3>
-                </div>
-                <div className="space-y-2 pl-8">
-                  <p className="text-white/90 text-sm sm:text-base">
-                    <span className="font-semibold">Duration:</span> 3 years full-time
-                  </p>
-                  <p className="text-white/90 text-sm sm:text-base">
-                    <span className="font-semibold">Level:</span> Undergraduate
-                  </p>
-                </div>
-              </div>
-
-              {/* Key Topics/Interests */}
+              {/* Key Topics */}
               {course.interests && course.interests.length > 0 && (
-                <div className="bg-white/10 rounded-2xl p-4 sm:p-5 border border-white/20">
-                  <div className="flex items-start gap-3 mb-3">
-                    <Heart className="w-5 h-5 text-[#fddb35] flex-shrink-0 mt-0.5" />
-                    <h3 className="text-white font-bold text-base sm:text-lg">Key Topics You'll Study</h3>
-                  </div>
-                  <div className="flex flex-wrap gap-2 pl-8">
+                <div>
+                  <h3 className="text-white font-bold text-lg sm:text-xl mb-3 flex items-center gap-2">
+                    <Heart className="w-5 h-5 text-[#fddb35]" />
+                    What You'll Study
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
                     {course.interests.map((interest, i) => (
                       <span
                         key={i}
-                        className="bg-[#fddb35]/20 border border-[#fddb35]/30 rounded-full px-3 py-1.5 text-xs sm:text-sm text-white font-medium"
+                        className="bg-white/10 border border-white/20 rounded-full px-4 py-2 text-sm text-white hover:bg-white/15 transition-colors"
                       >
                         {interest}
                       </span>
@@ -218,101 +206,186 @@ const CourseDetails = () => {
                   </div>
                 </div>
               )}
+
+              {/* Career Outcomes */}
+              <div className="bg-gradient-to-br from-[#fddb35]/10 to-transparent rounded-2xl p-5 border border-[#fddb35]/20">
+                <h3 className="text-white font-bold text-lg sm:text-xl mb-4 flex items-center gap-2">
+                  <Briefcase className="w-5 h-5 text-[#fddb35]" />
+                  Career Prospects
+                </h3>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <TrendingUp className="w-5 h-5 text-[#fddb35] flex-shrink-0 mt-0.5" />
+                    <p className="text-white/90 text-sm sm:text-base">
+                      <span className="font-semibold text-[#fddb35]">95%</span> of graduates employed within 6 months
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <TrendingUp className="w-5 h-5 text-[#fddb35] flex-shrink-0 mt-0.5" />
+                    <p className="text-white/90 text-sm sm:text-base">
+                      Average starting salary: <span className="font-semibold text-[#fddb35]">£28,000</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Video Preview */}
+              <div>
+                <h3 className="text-white font-bold text-lg sm:text-xl mb-3 flex items-center gap-2">
+                  <Play className="w-5 h-5 text-[#fddb35]" />
+                  Campus Life
+                </h3>
+                <div className="relative aspect-video bg-black/20 rounded-xl overflow-hidden">
+                  <iframe
+                    className="absolute inset-0 w-full h-full"
+                    src="https://www.youtube.com/embed/Mm7-JZ8xAKk"
+                    title="University of Lincoln - Campus Tour"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
+                </div>
+              </div>
+
+              {/* Student Testimonial */}
+              <div className="bg-white/5 rounded-2xl p-5 border border-white/20">
+                <h3 className="text-white font-bold text-lg sm:text-xl mb-4 flex items-center gap-2">
+                  <Users className="w-5 h-5 text-[#fddb35]" />
+                  Student Voice
+                </h3>
+                <p className="text-white/80 text-sm sm:text-base leading-relaxed mb-4 italic">
+                  "The hands-on approach and industry connections at Lincoln gave me the skills to land my dream job before graduation!"
+                </p>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#fddb35] to-[#ffd700] flex items-center justify-center">
+                    <span className="text-[#1a0a2e] font-bold text-lg">SM</span>
+                  </div>
+                  <div>
+                    <p className="text-white font-semibold text-sm">Sarah Mitchell</p>
+                    <p className="text-white/60 text-xs">Class of 2023 • Software Engineer at Google</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Course Structure Accordion */}
+              <div className="bg-white/5 rounded-2xl border border-white/20 overflow-hidden">
+                <button
+                  onClick={() => setShowCourseStructure(!showCourseStructure)}
+                  className="w-full p-5 flex items-center justify-between hover:bg-white/10 transition-colors"
+                >
+                  <h3 className="text-white font-bold text-lg sm:text-xl flex items-center gap-2">
+                    <BookOpen className="w-5 h-5 text-[#fddb35]" />
+                    Course Structure
+                  </h3>
+                  {showCourseStructure ? (
+                    <ChevronUp className="w-5 h-5 text-white/70" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5 text-white/70" />
+                  )}
+                </button>
+
+                {showCourseStructure && (
+                  <div className="px-5 pb-5 space-y-3 animate-in slide-in-from-top-2 duration-300">
+                    <div className="bg-white/5 rounded-xl p-4">
+                      <h4 className="text-white font-semibold text-sm sm:text-base mb-2 flex items-center gap-2">
+                        <span className="w-6 h-6 rounded-full bg-[#fddb35] flex items-center justify-center text-[#1a0a2e] text-xs font-bold">1</span>
+                        Year 1: Foundation
+                      </h4>
+                      <p className="text-white/70 text-xs sm:text-sm">
+                        Build core knowledge with introductory modules and develop fundamental skills.
+                      </p>
+                    </div>
+
+                    <div className="bg-white/5 rounded-xl p-4">
+                      <h4 className="text-white font-semibold text-sm sm:text-base mb-2 flex items-center gap-2">
+                        <span className="w-6 h-6 rounded-full bg-[#fddb35] flex items-center justify-center text-[#1a0a2e] text-xs font-bold">2</span>
+                        Year 2: Development
+                      </h4>
+                      <p className="text-white/70 text-xs sm:text-sm">
+                        Apply knowledge through practical projects and industry placements.
+                      </p>
+                    </div>
+
+                    <div className="bg-white/5 rounded-xl p-4">
+                      <h4 className="text-white font-semibold text-sm sm:text-base mb-2 flex items-center gap-2">
+                        <span className="w-6 h-6 rounded-full bg-[#fddb35] flex items-center justify-center text-[#1a0a2e] text-xs font-bold">3</span>
+                        Year 3: Mastery
+                      </h4>
+                      <p className="text-white/70 text-xs sm:text-sm">
+                        Complete your dissertation and prepare for your professional career.
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Primary CTAs */}
-          <div className="space-y-3 mb-6">
-            {/* Apply Now - Primary CTA */}
+          {/* Action Buttons */}
+          <div className="space-y-4 mb-8">
+            {/* Primary CTA */}
             <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-[#fddb35] to-[#ffd700] rounded-2xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity duration-300"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-[#fddb35] to-[#ffd700] rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity"></div>
               <button
                 onClick={handleApplyNow}
-                className="relative w-full h-14 sm:h-16 rounded-2xl font-bold text-base sm:text-lg bg-gradient-to-r from-[#fddb35] to-[#ffd700] hover:from-[#ffd700] hover:to-[#fddb35] text-[#1a0a2e] shadow-2xl hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-2 active:scale-95"
-                aria-label="Apply now for this course"
+                className="relative w-full h-16 sm:h-18 rounded-2xl font-bold text-lg sm:text-xl bg-gradient-to-r from-[#fddb35] to-[#ffd700] hover:from-[#ffd700] hover:to-[#fddb35] text-[#1a0a2e] shadow-2xl hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-3 active:scale-95"
               >
-                <ExternalLink className="w-5 h-5 sm:w-6 sm:h-6" />
-                <span>View Full Course Details & Apply</span>
-                <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                <ExternalLink className="w-6 h-6" />
+                <span>Apply Now</span>
+                <ArrowRight className="w-6 h-6" />
               </button>
             </div>
 
-            {/* Request Information */}
-            <button
-              onClick={handleEmailClick}
-              className="w-full h-12 sm:h-14 rounded-2xl font-bold text-sm sm:text-base bg-white/15 hover:bg-white/25 text-white border-2 border-white/30 hover:border-white/40 shadow-lg hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-2 active:scale-95"
-              aria-label="Request course information via email"
-            >
-              <Mail className="w-5 h-5" />
-              <span>Email Me Course Information</span>
-            </button>
-          </div>
-
-          {/* Secondary Actions */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-            {/* Chat with Advisor */}
-            <button
-              onClick={handleChatWithAdvisor}
-              className="h-12 sm:h-14 rounded-2xl font-bold text-sm sm:text-base bg-[#cd1f80] hover:bg-[#a01866] text-white shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 active:scale-95"
-              aria-label="Chat with course advisor"
-            >
-              <MessageCircle className="w-5 h-5" />
-              <span>Chat with Advisor</span>
-            </button>
-
-            {/* Download Prospectus */}
-            {course.link && (
-              <a
-                href={course.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="h-12 sm:h-14 rounded-2xl font-bold text-sm sm:text-base bg-white/15 hover:bg-white/25 text-white border-2 border-white/30 hover:border-white/40 shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 active:scale-95"
-                aria-label="Download course prospectus"
+            {/* Secondary Actions Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <button
+                onClick={handleEmailClick}
+                className="h-14 rounded-xl font-semibold text-sm sm:text-base bg-white/10 hover:bg-white/20 text-white border border-white/30 hover:border-white/40 transition-all duration-300 flex items-center justify-center gap-2 active:scale-95"
               >
-                <Download className="w-5 h-5" />
-                <span>Course Prospectus</span>
-              </a>
-            )}
+                <Mail className="w-5 h-5" />
+                <span>Get Info</span>
+              </button>
+
+              <button
+                onClick={handleChatWithAdvisor}
+                className="h-14 rounded-xl font-semibold text-sm sm:text-base bg-white/10 hover:bg-white/20 text-white border border-white/30 hover:border-white/40 transition-all duration-300 flex items-center justify-center gap-2 active:scale-95"
+              >
+                <MessageCircle className="w-5 h-5" />
+                <span>Chat</span>
+              </button>
+
+              <div className="sm:col-span-1">
+                <ShareButton
+                  courseName={course.name}
+                  courseId={course.name.toLowerCase().replace(/\s+/g, '-')}
+                />
+              </div>
+            </div>
           </div>
 
-          {/* Share Button */}
-          <div className="mb-6">
-            <ShareButton
-              courseName={course.name}
-              courseId={course.name.toLowerCase().replace(/\s+/g, '-')}
-            />
-          </div>
-
-          {/* Navigation Arrows (if multiple courses) */}
+          {/* Course Navigation (if multiple) */}
           {matchedCourses.length > 1 && (
-            <div className="flex justify-between items-center gap-4">
+            <div className="flex justify-between items-center gap-4 mb-8">
               <button
                 onClick={handlePrevious}
                 disabled={currentIndex === 0}
-                className={`flex items-center gap-2 px-4 sm:px-6 py-3 rounded-xl font-bold text-sm sm:text-base transition-all duration-300 ${
+                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${
                   currentIndex === 0
-                    ? "bg-white/10 text-white/40 cursor-not-allowed"
-                    : "bg-white/20 hover:bg-white/30 text-white hover:scale-105 active:scale-95"
+                    ? "bg-white/5 text-white/30 cursor-not-allowed"
+                    : "bg-white/10 hover:bg-white/20 text-white active:scale-95"
                 }`}
-                aria-label="Previous course"
               >
                 <ChevronLeft className="w-5 h-5" />
                 <span className="hidden sm:inline">Previous</span>
               </button>
 
-              <div className="text-white/60 text-sm font-medium">
-                {currentIndex + 1} / {matchedCourses.length}
-              </div>
-
               <button
                 onClick={handleNext}
                 disabled={currentIndex === matchedCourses.length - 1}
-                className={`flex items-center gap-2 px-4 sm:px-6 py-3 rounded-xl font-bold text-sm sm:text-base transition-all duration-300 ${
+                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${
                   currentIndex === matchedCourses.length - 1
-                    ? "bg-white/10 text-white/40 cursor-not-allowed"
-                    : "bg-white/20 hover:bg-white/30 text-white hover:scale-105 active:scale-95"
+                    ? "bg-white/5 text-white/30 cursor-not-allowed"
+                    : "bg-white/10 hover:bg-white/20 text-white active:scale-95"
                 }`}
-                aria-label="Next course"
               >
                 <span className="hidden sm:inline">Next</span>
                 <ChevronRight className="w-5 h-5" />
@@ -320,44 +393,51 @@ const CourseDetails = () => {
             </div>
           )}
 
-          {/* What's Next Section */}
-          <div className="mt-8 bg-white/10 rounded-3xl p-6 sm:p-8 border-2 border-white/20">
-            <h3 className="text-xl sm:text-2xl font-black text-white mb-4 flex items-center gap-2">
+          {/* What's Next */}
+          <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-white/20">
+            <h3 className="text-xl sm:text-2xl font-bold text-white mb-6 flex items-center gap-2">
               <Sparkles className="w-6 h-6 text-[#fddb35]" />
-              What's Next, {studentName}?
+              Next Steps
             </h3>
-            <div className="space-y-3">
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-[#fddb35] flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-[#1a0a2e] text-xs font-bold">✓</span>
+            <div className="space-y-4">
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 rounded-full bg-[#fddb35] flex items-center justify-center flex-shrink-0">
+                  <span className="text-[#1a0a2e] font-bold">✓</span>
                 </div>
-                <p className="text-white/90 text-sm sm:text-base">
-                  <span className="font-bold">Matched</span> - You've found your perfect course!
-                </p>
+                <div>
+                  <p className="text-white font-semibold">You've matched!</p>
+                  <p className="text-white/70 text-sm">Found your perfect course at Lincoln</p>
+                </div>
               </div>
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-white/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-white text-xs font-bold">2</span>
+
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                  <span className="text-white font-bold text-sm">2</span>
                 </div>
-                <p className="text-white/90 text-sm sm:text-base">
-                  <span className="font-bold">Explore</span> - Review full course details and requirements
-                </p>
+                <div>
+                  <p className="text-white font-semibold">Explore details</p>
+                  <p className="text-white/70 text-sm">Review requirements and structure</p>
+                </div>
               </div>
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-white/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-white text-xs font-bold">3</span>
+
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                  <span className="text-white font-bold text-sm">3</span>
                 </div>
-                <p className="text-white/90 text-sm sm:text-base">
-                  <span className="font-bold">Apply</span> - Submit your UCAS application
-                </p>
+                <div>
+                  <p className="text-white font-semibold">Apply via UCAS</p>
+                  <p className="text-white/70 text-sm">Submit your application</p>
+                </div>
               </div>
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-white/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-white text-xs font-bold">4</span>
+
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                  <span className="text-white font-bold text-sm">4</span>
                 </div>
-                <p className="text-white/90 text-sm sm:text-base">
-                  <span className="font-bold">Succeed</span> - Start your journey at University of Lincoln!
-                </p>
+                <div>
+                  <p className="text-white font-semibold">Start your journey</p>
+                  <p className="text-white/70 text-sm">Begin at University of Lincoln</p>
+                </div>
               </div>
             </div>
           </div>
