@@ -1,13 +1,15 @@
 import { useEffect } from "react";
-import { Heart, Sparkles, ChevronRight } from "lucide-react";
+import { Heart, Sparkles, ChevronRight, Eye } from "lucide-react";
 import { Course } from "@/data/coursesData";
 
 interface FirstMatchModalProps {
   course: Course;
   onContinue: () => void;
+  onViewMatch: () => void;
+  hasMoreCourses: boolean;
 }
 
-export const FirstMatchModal = ({ course, onContinue }: FirstMatchModalProps) => {
+export const FirstMatchModal = ({ course, onContinue, onViewMatch, hasMoreCourses }: FirstMatchModalProps) => {
   useEffect(() => {
     // Prevent body scroll when modal is open
     document.body.style.overflow = 'hidden';
@@ -65,22 +67,40 @@ export const FirstMatchModal = ({ course, onContinue }: FirstMatchModalProps) =>
             </p>
           </div>
 
-          {/* Tutorial Message */}
-          <div className="bg-[#fddb35]/20 rounded-xl p-4 mb-6 border border-[#fddb35]/30 animate-in slide-in-from-bottom-4 duration-500 delay-600">
-            <p className="text-white text-sm sm:text-base leading-relaxed">
-              <span className="font-bold">Keep swiping</span> to discover more courses that match your interests. Swipe <span className="font-bold text-[#fddb35]">right</span> to like, <span className="font-bold text-white/70">left</span> to pass.
-            </p>
-          </div>
+          {/* Action Buttons */}
+          <div className="space-y-3 animate-in slide-in-from-bottom-4 duration-500 delay-600">
+            {/* Primary CTA - View This Match */}
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-[#fddb35] to-[#ffd700] rounded-2xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity duration-300"></div>
+              <button
+                onClick={onViewMatch}
+                className="relative w-full h-14 rounded-2xl font-bold text-base sm:text-lg bg-gradient-to-r from-[#fddb35] to-[#ffd700] hover:from-[#ffd700] hover:to-[#fddb35] text-[#1a0a2e] shadow-2xl hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-2 active:scale-95"
+                aria-label="View this match now"
+              >
+                <Eye className="w-5 h-5" />
+                <span>View This Match Now</span>
+              </button>
+            </div>
 
-          {/* Continue Button */}
-          <button
-            onClick={onContinue}
-            className="w-full h-14 rounded-2xl font-bold text-base sm:text-lg bg-gradient-to-r from-[#fddb35] to-[#ffd700] hover:from-[#ffd700] hover:to-[#fddb35] text-[#1a0a2e] shadow-2xl hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-2 active:scale-95 animate-in slide-in-from-bottom-4 duration-500 delay-700"
-            aria-label="Continue swiping"
-          >
-            <span>Continue Swiping</span>
-            <ChevronRight className="w-5 h-5" />
-          </button>
+            {/* Secondary CTA - Continue Swiping (only if more courses) */}
+            {hasMoreCourses && (
+              <button
+                onClick={onContinue}
+                className="w-full h-12 sm:h-14 rounded-2xl font-bold text-sm sm:text-base bg-white/15 hover:bg-white/25 text-white border-2 border-white/30 hover:border-white/40 shadow-lg hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-2 active:scale-95"
+                aria-label="Continue swiping"
+              >
+                <span>Continue Swiping</span>
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            )}
+
+            {/* Info Text */}
+            {hasMoreCourses && (
+              <p className="text-white/60 text-xs sm:text-sm text-center">
+                More courses available to explore
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -88,18 +88,32 @@ const Matching = () => {
     };
   }, []);
 
-  // Show email modal when matching is complete and user has selected courses
+  // Show email modal ONLY when matching is complete (on completion screen)
+  // NOT during active swiping, NOT when other modals are open
   useEffect(() => {
-    if (currentIndex >= suggestedCourses.length && selectedCourses.length > 0) {
-      const hasEmail = localStorage.getItem("userEmail");
-      if (!hasEmail) {
-        const timer = setTimeout(() => {
-          setShowEmailModal(true);
-        }, 2500);
-        return () => clearTimeout(timer);
-      }
+    // Only trigger if we're on the completion screen (all cards reviewed)
+    const isCompletionScreen = currentIndex >= suggestedCourses.length;
+    const hasMatches = selectedCourses.length > 0;
+    const hasEmail = localStorage.getItem("userEmail");
+
+    // CRITICAL: Do NOT show email modal if FirstMatchModal is open!
+    // This prevents both modals from appearing at the same time
+    if (showFirstMatchModal) {
+      return; // Exit early if FirstMatchModal is showing
     }
-  }, [currentIndex, selectedCourses.length, suggestedCourses.length]);
+
+    // ONLY show email modal if:
+    // 1. User finished all cards (completion screen)
+    // 2. User has at least one match
+    // 3. User hasn't provided email yet
+    // 4. No other modals are open (FirstMatchModal)
+    if (isCompletionScreen && hasMatches && !hasEmail) {
+      const timer = setTimeout(() => {
+        setShowEmailModal(true);
+      }, 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [currentIndex, suggestedCourses.length, selectedCourses.length, showFirstMatchModal]);
 
   const onSwipe = (direction: string, course: Course) => {
     setLastDirection(direction);
@@ -203,6 +217,8 @@ const Matching = () => {
   const handleViewCourses = () => {
     if (selectedCourses.length > 0) {
       localStorage.setItem("matchedCourses", JSON.stringify(selectedCourses));
+      // Close email modal if it's queued (prevent it from showing)
+      setShowEmailModal(false);
       navigate("/course-details");
     }
   };
@@ -219,6 +235,19 @@ const Matching = () => {
     localStorage.clear();
     sessionStorage.clear(); // Clear session storage to show loading animation on restart
     navigate("/");
+  };
+
+  const handleViewMatchFromModal = () => {
+    // Save matches and navigate to course details
+    localStorage.setItem("matchedCourses", JSON.stringify(selectedCourses));
+    // Close email modal if it's queued (prevent it from showing)
+    setShowEmailModal(false);
+    navigate("/course-details");
+  };
+
+  const handleContinueFromModal = () => {
+    // Simply close the modal and continue swiping
+    setShowFirstMatchModal(false);
   };
 
   // Loading State with Modern Animation
@@ -503,6 +532,23 @@ const Matching = () => {
           </div>
         )}
 
+        {/* Floating View Matches Button (appears when user has matches while swiping) */}
+        {currentIndex < suggestedCourses.length && selectedCourses.length > 0 && (
+          <div className="fixed bottom-24 sm:bottom-28 left-1/2 -translate-x-1/2 z-40 animate-in slide-in-from-bottom-4 fade-in duration-500">
+            <button
+              onClick={handleViewCourses}
+              className="relative group"
+              aria-label={`View ${selectedCourses.length} ${selectedCourses.length === 1 ? 'match' : 'matches'}`}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-[#cd1f80] to-[#a01866] rounded-full blur-lg opacity-50 group-hover:opacity-75 transition-opacity duration-300"></div>
+              <div className="relative bg-gradient-to-r from-[#cd1f80] to-[#a01866] hover:from-[#a01866] hover:to-[#cd1f80] text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-2 font-bold text-sm sm:text-base border-2 border-white/30 hover:scale-105 transition-all duration-300 active:scale-95">
+                <Heart className="w-5 h-5 fill-white" />
+                <span>View {selectedCourses.length} {selectedCourses.length === 1 ? 'Match' : 'Matches'}</span>
+              </div>
+            </button>
+          </div>
+        )}
+
         {/* Helper Text for Active Swiping */}
         {currentIndex < suggestedCourses.length && (
           <div className="bg-white/15 rounded-2xl sm:rounded-3xl p-4 sm:p-5 mb-4 border border-white/30 shadow-lg animate-in fade-in duration-700">
@@ -600,7 +646,9 @@ const Matching = () => {
       {showFirstMatchModal && firstMatchCourse && (
         <FirstMatchModal
           course={firstMatchCourse}
-          onContinue={() => setShowFirstMatchModal(false)}
+          onContinue={handleContinueFromModal}
+          onViewMatch={handleViewMatchFromModal}
+          hasMoreCourses={currentIndex < suggestedCourses.length - 1}
         />
       )}
     </div>

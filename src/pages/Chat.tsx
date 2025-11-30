@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, X, Bot, User, ArrowLeft, Phone, Video, MoreVertical } from "lucide-react";
+import { Send, Bot, User, ArrowLeft } from "lucide-react";
 
 const Chat = () => {
   const [messages, setMessages] = useState([
@@ -15,8 +14,8 @@ const Chat = () => {
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
-  const name = localStorage.getItem("studentName") || "Student";
 
   // Auto-scroll to bottom when new messages arrive
   const scrollToBottom = () => {
@@ -26,6 +25,20 @@ const Chat = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Prevent viewport resize on mobile keyboard open
+  useEffect(() => {
+    // Set viewport height CSS variable
+    const setVh = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    };
+
+    setVh();
+    window.addEventListener('resize', setVh);
+
+    return () => window.removeEventListener('resize', setVh);
+  }, []);
 
   const handleSend = () => {
     if (!inputValue.trim()) return;
@@ -39,6 +52,9 @@ const Chat = () => {
     setMessages((prev) => [...prev, userMessage]);
     setInputValue("");
     setIsTyping(true);
+
+    // Blur input to hide mobile keyboard after send
+    inputRef.current?.blur();
 
     // Simulate bot response delay
     setTimeout(() => {
@@ -78,8 +94,7 @@ const Chat = () => {
   };
 
   const handleBack = () => {
-    // Navigate to matching page to continue the course matching flow
-    navigate("/matching");
+    navigate("/course-details");
   };
 
   const quickQuestions = [
@@ -90,193 +105,167 @@ const Chat = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#cd1f80] via-[#a01866] to-[#1a0a2e] flex flex-col relative overflow-hidden">
+    <div className="fixed inset-0 bg-gradient-to-br from-[#cd1f80] via-[#a01866] to-[#1a0a2e] flex flex-col overflow-hidden" style={{ height: 'calc(var(--vh, 1vh) * 100)' }}>
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-64 h-64 sm:w-80 sm:h-80 bg-[#fddb35] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
         <div className="absolute bottom-20 right-10 w-64 h-64 sm:w-80 sm:h-80 bg-[#cd1f80] rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse delay-700"></div>
       </div>
 
-      {/* Header */}
-      <div className="relative z-10 bg-gradient-to-r from-[#1a0a2e] to-[#2d1b3d] border-b border-white/10 shadow-2xl">
-        <div className="max-w-4xl mx-auto px-4 py-3 sm:py-4">
-          <div className="flex items-center justify-between gap-3">
+      {/* Header - Fixed */}
+      <div className="relative z-10 bg-gradient-to-r from-[#1a0a2e]/90 to-[#2d1b3d]/90 backdrop-blur-sm border-b border-white/10 shadow-xl flex-shrink-0">
+        <div className="max-w-4xl mx-auto px-3 py-3 sm:px-4 sm:py-4">
+          <div className="flex items-center gap-3">
             {/* Back Button */}
             <button
               onClick={handleBack}
-              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 flex items-center justify-center transition-all duration-300 active:scale-95"
+              className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 flex items-center justify-center transition-all duration-200 active:scale-95 flex-shrink-0"
               aria-label="Go back"
             >
-              <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              <ArrowLeft className="w-5 h-5 text-white" />
             </button>
 
             {/* Bot Info */}
-            <div className="flex-1 flex items-center gap-3">
-              <div className="relative">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-[#fddb35] to-[#ffd700] flex items-center justify-center shadow-lg">
+            <div className="flex items-center gap-2.5 flex-1 min-w-0">
+              <div className="relative flex-shrink-0">
+                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-[#fddb35] to-[#ffd700] flex items-center justify-center shadow-lg">
                   <Bot className="w-5 h-5 sm:w-6 sm:h-6 text-[#1a0a2e]" />
                 </div>
                 {/* Online indicator */}
-                <div className="absolute bottom-0 right-0 w-3 h-3 sm:w-3.5 sm:h-3.5 bg-[#00ff00] rounded-full border-2 border-[#1a0a2e]"></div>
+                <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-[#1a0a2e]"></div>
               </div>
               <div className="flex-1 min-w-0">
-                <h2 className="text-sm sm:text-base md:text-lg font-black text-white truncate">
+                <h2 className="text-sm sm:text-base font-bold text-white truncate">
                   Lincoln Course Advisor
                 </h2>
-                <p className="text-xs sm:text-sm text-white/70">
-                  {isTyping ? 'Typing...' : 'Online • Ready to help'}
+                <p className="text-xs text-white/70 truncate">
+                  {isTyping ? 'Typing...' : 'Online'}
                 </p>
               </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="hidden sm:flex items-center gap-2">
-              <button
-                className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 flex items-center justify-center transition-all duration-300 active:scale-95"
-                aria-label="Voice call"
-              >
-                <Phone className="w-5 h-5 text-white" />
-              </button>
-              <button
-                className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 flex items-center justify-center transition-all duration-300 active:scale-95"
-                aria-label="Video call"
-              >
-                <Video className="w-5 h-5 text-white" />
-              </button>
-              <button
-                className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 flex items-center justify-center transition-all duration-300 active:scale-95"
-                aria-label="More options"
-              >
-                <MoreVertical className="w-5 h-5 text-white" />
-              </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Messages Container */}
-      <div className="flex-1 relative z-10 overflow-hidden">
-        <div className="max-w-4xl mx-auto h-full flex flex-col">
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-4 py-4 sm:py-6 space-y-4 sm:space-y-5">
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                className={`animate-in fade-in slide-in-from-bottom-4 duration-500 flex ${
-                  message.role === "user" ? "justify-end" : "justify-start"
-                }`}
-                style={{ animationDelay: `${index * 50}ms` }}
-              >
-                {message.role === "bot" ? (
-                  <div className="flex gap-2 sm:gap-3 max-w-[85%] sm:max-w-[75%]">
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[#fddb35] to-[#ffd700] flex items-center justify-center flex-shrink-0 shadow-lg">
-                      <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-[#1a0a2e]" />
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <div className="bg-white/15 rounded-3xl rounded-tl-md px-4 py-3 sm:px-5 sm:py-4 border border-white/20 shadow-lg">
-                        <p className="text-sm sm:text-base text-white leading-relaxed whitespace-pre-line">
-                          {message.content}
-                        </p>
-                      </div>
-                      <span className="text-xs text-white/50 px-3">{message.timestamp}</span>
-                    </div>
+      {/* Messages Container - Scrollable */}
+      <div className="relative z-10 flex-1 overflow-y-auto">
+        <div className="max-w-4xl mx-auto px-3 py-4 sm:px-4 sm:py-5 space-y-4">
+          {messages.map((message, index) => (
+            <div
+              key={index}
+              className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+            >
+              {message.role === "bot" ? (
+                <div className="flex gap-2 max-w-[90%] sm:max-w-[80%]">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#fddb35] to-[#ffd700] flex items-center justify-center flex-shrink-0 shadow-lg">
+                    <Bot className="w-4 h-4 text-[#1a0a2e]" />
                   </div>
-                ) : (
-                  <div className="flex gap-2 sm:gap-3 max-w-[85%] sm:max-w-[75%]">
-                    <div className="flex flex-col gap-1 items-end">
-                      <div className="bg-gradient-to-br from-[#fddb35] to-[#ffd700] rounded-3xl rounded-tr-md px-4 py-3 sm:px-5 sm:py-4 shadow-lg">
-                        <p className="text-sm sm:text-base text-[#1a0a2e] font-medium leading-relaxed">
-                          {message.content}
-                        </p>
-                      </div>
-                      <span className="text-xs text-white/50 px-3">{message.timestamp}</span>
+                  <div className="flex flex-col gap-1">
+                    <div className="bg-white/15 backdrop-blur-sm rounded-2xl rounded-tl-md px-3 py-2.5 sm:px-4 sm:py-3 border border-white/20 shadow-lg">
+                      <p className="text-sm sm:text-base text-white leading-relaxed whitespace-pre-line">
+                        {message.content}
+                      </p>
                     </div>
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 border-2 border-white/30">
-                      <User className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-
-            {/* Typing Indicator */}
-            {isTyping && (
-              <div className="flex gap-3 animate-in fade-in duration-300">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[#fddb35] to-[#ffd700] flex items-center justify-center flex-shrink-0 shadow-lg">
-                  <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-[#1a0a2e]" />
-                </div>
-                <div className="bg-white/15 rounded-3xl rounded-tl-md px-5 py-4 border border-white/20">
-                  <div className="flex gap-1.5">
-                    <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                    <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                    <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                    <span className="text-xs text-white/50 px-2">{message.timestamp}</span>
                   </div>
                 </div>
+              ) : (
+                <div className="flex gap-2 max-w-[90%] sm:max-w-[80%]">
+                  <div className="flex flex-col gap-1 items-end">
+                    <div className="bg-gradient-to-br from-[#fddb35] to-[#ffd700] rounded-2xl rounded-tr-md px-3 py-2.5 sm:px-4 sm:py-3 shadow-lg">
+                      <p className="text-sm sm:text-base text-[#1a0a2e] font-medium leading-relaxed">
+                        {message.content}
+                      </p>
+                    </div>
+                    <span className="text-xs text-white/50 px-2">{message.timestamp}</span>
+                  </div>
+                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 border-2 border-white/30">
+                    <User className="w-4 h-4 text-white" />
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+
+          {/* Typing Indicator */}
+          {isTyping && (
+            <div className="flex gap-2">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#fddb35] to-[#ffd700] flex items-center justify-center flex-shrink-0 shadow-lg">
+                <Bot className="w-4 h-4 text-[#1a0a2e]" />
               </div>
-            )}
-
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Quick Questions (shown when no messages from user yet) */}
-          {messages.length === 1 && (
-            <div className="px-4 pb-4">
-              <p className="text-xs sm:text-sm text-white/70 mb-3 text-center">Quick questions to get started:</p>
-              <div className="flex flex-wrap gap-2 justify-center">
-                {quickQuestions.map((question, index) => (
-                  <button
-                    key={index}
-                    onClick={() => {
-                      setInputValue(question);
-                      setTimeout(() => handleSend(), 100);
-                    }}
-                    className="px-3 py-2 sm:px-4 sm:py-2 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 border border-white/30 text-xs sm:text-sm text-white transition-all duration-300 active:scale-95"
-                  >
-                    {question}
-                  </button>
-                ))}
+              <div className="bg-white/15 backdrop-blur-sm rounded-2xl rounded-tl-md px-4 py-3 border border-white/20">
+                <div className="flex gap-1.5">
+                  <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                  <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                </div>
               </div>
             </div>
           )}
 
-          {/* Input Area */}
-          <div className="px-4 pb-4 sm:pb-6">
-            <div className="bg-white/15 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-2 sm:p-3 border border-white/30 shadow-2xl">
-              <div className="flex items-end gap-2 sm:gap-3">
-                <div className="flex-1 max-h-32 overflow-y-auto">
-                  <Input
-                    type="text"
-                    placeholder="Type your message..."
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault();
-                        handleSend();
-                      }
-                    }}
-                    className="border-0 bg-transparent focus-visible:ring-0 text-sm sm:text-base text-white placeholder:text-white/50 resize-none"
-                    disabled={isTyping}
-                  />
-                </div>
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Quick Questions (shown when no messages from user yet) */}
+        {messages.length === 1 && (
+          <div className="max-w-4xl mx-auto px-3 pb-4 sm:px-4">
+            <p className="text-xs text-white/70 mb-3 text-center">Quick questions:</p>
+            <div className="flex flex-wrap gap-2 justify-center">
+              {quickQuestions.map((question, index) => (
                 <button
-                  onClick={handleSend}
-                  disabled={!inputValue.trim() || isTyping}
-                  className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg flex-shrink-0 ${
-                    inputValue.trim() && !isTyping
-                      ? 'bg-gradient-to-br from-[#fddb35] to-[#ffd700] hover:from-[#ffd700] hover:to-[#fddb35] active:scale-90'
-                      : 'bg-white/10 cursor-not-allowed'
-                  }`}
-                  aria-label="Send message"
+                  key={index}
+                  onClick={() => {
+                    setInputValue(question);
+                    setTimeout(() => handleSend(), 100);
+                  }}
+                  className="px-3 py-2 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 border border-white/30 text-xs text-white transition-all duration-200 active:scale-95"
                 >
-                  <Send className={`w-5 h-5 sm:w-6 sm:h-6 ${inputValue.trim() && !isTyping ? 'text-[#1a0a2e]' : 'text-white/50'}`} />
+                  {question}
                 </button>
-              </div>
+              ))}
             </div>
-            <p className="text-xs text-white/50 text-center mt-2 px-4">
-              Press Enter to send • Shift+Enter for new line
-            </p>
           </div>
+        )}
+      </div>
+
+      {/* Input Area - Fixed at Bottom */}
+      <div className="relative z-10 flex-shrink-0 border-t border-white/10 bg-gradient-to-r from-[#1a0a2e]/90 to-[#2d1b3d]/90 backdrop-blur-sm">
+        <div className="max-w-4xl mx-auto px-3 py-3 sm:px-4 sm:py-4">
+          <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-2 border border-white/30 shadow-lg">
+            <div className="flex items-center gap-2">
+              <Input
+                ref={inputRef}
+                type="text"
+                placeholder="Type your message..."
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                  }
+                }}
+                className="flex-1 border-0 bg-transparent focus-visible:ring-0 text-sm sm:text-base text-white placeholder:text-white/50 h-10"
+                disabled={isTyping}
+                autoComplete="off"
+              />
+              <button
+                onClick={handleSend}
+                disabled={!inputValue.trim() || isTyping}
+                className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg flex-shrink-0 ${
+                  inputValue.trim() && !isTyping
+                    ? 'bg-gradient-to-br from-[#fddb35] to-[#ffd700] hover:from-[#ffd700] hover:to-[#fddb35] active:scale-90'
+                    : 'bg-white/10 cursor-not-allowed opacity-50'
+                }`}
+                aria-label="Send message"
+              >
+                <Send className={`w-5 h-5 ${inputValue.trim() && !isTyping ? 'text-[#1a0a2e]' : 'text-white/50'}`} />
+              </button>
+            </div>
+          </div>
+          <p className="text-xs text-white/50 text-center mt-2">
+            Press Enter to send
+          </p>
         </div>
       </div>
     </div>

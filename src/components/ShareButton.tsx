@@ -8,7 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Share2, Instagram, MessageCircle, Facebook, Twitter, Download } from "lucide-react";
+import { Share2, Instagram, MessageCircle, Facebook, Twitter, Sparkles, X, GraduationCap } from "lucide-react";
 import { toast } from "sonner";
 
 interface ShareButtonProps {
@@ -37,10 +37,11 @@ export const ShareButton = ({ courseName, courseId }: ShareButtonProps) => {
         throw new Error('Could not get canvas context');
       }
 
-      // Background gradient
+      // Background gradient - Lincoln branding
       const gradient = ctx.createLinearGradient(0, 0, 0, 1920);
-      gradient.addColorStop(0, '#667eea');
-      gradient.addColorStop(1, '#764ba2');
+      gradient.addColorStop(0, '#cd1f80'); // Lincoln Pink
+      gradient.addColorStop(0.5, '#a01866'); // Lincoln Pink Dark
+      gradient.addColorStop(1, '#1a0a2e'); // Dark Purple
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, 1080, 1920);
 
@@ -158,38 +159,54 @@ export const ShareButton = ({ courseName, courseId }: ShareButtonProps) => {
     <Dialog>
       <DialogTrigger asChild>
         <Button
-          size="lg"
-          className="w-full h-14 text-lg font-bold gap-3 bg-white text-[hsl(var(--ocean-deep))] hover:bg-white/90 shadow-lg"
+          className="w-full h-12 sm:h-14 rounded-2xl font-bold text-sm sm:text-base bg-white/15 hover:bg-white/25 text-white border-2 border-white/30 hover:border-white/40 shadow-lg hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-2 active:scale-95"
         >
           <Share2 className="w-5 h-5" />
           Share My Match
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-2xl">Share Your Course Match! 🎉</DialogTitle>
-          <DialogDescription className="text-base">
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto bg-gradient-to-br from-[#cd1f80] via-[#a01866] to-[#1a0a2e] border-2 border-white/20 text-white">
+        <DialogHeader className="text-center space-y-3">
+          {/* Icon */}
+          <div className="flex justify-center">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-[#fddb35] to-[#ffd700] flex items-center justify-center shadow-2xl">
+              <Share2 className="w-8 h-8 sm:w-10 sm:h-10 text-[#cd1f80]" />
+            </div>
+          </div>
+
+          <DialogTitle className="text-xl sm:text-2xl md:text-3xl font-black text-white">
+            Share Your Match! 🎉
+          </DialogTitle>
+          <DialogDescription className="text-white/80 text-sm sm:text-base">
             Let your friends know you found your perfect course at Lincoln
           </DialogDescription>
+
+          {/* University Badge */}
+          <div className="inline-flex items-center gap-2 bg-[#fddb35]/20 px-4 py-2 rounded-full border border-[#fddb35]/30 mx-auto">
+            <GraduationCap className="w-4 h-4 text-[#fddb35]" />
+            <span className="text-[#fddb35] text-xs sm:text-sm font-bold">University of Lincoln</span>
+          </div>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          {/* Native Share (Mobile) */}
-          <Button
-            onClick={handleNativeShare}
-            className="w-full h-16 text-lg gap-3 bg-gradient-to-r from-[hsl(var(--teal-bright))] to-[hsl(var(--accent))] hover:opacity-90"
-            variant="default"
-          >
-            <Share2 className="w-6 h-6" />
-            Share Now
-          </Button>
+          {/* Native Share (Mobile) - Primary CTA */}
+          <div className="relative group">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#fddb35] to-[#ffd700] rounded-2xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity duration-300"></div>
+            <Button
+              onClick={handleNativeShare}
+              className="relative w-full h-14 sm:h-16 text-base sm:text-lg font-bold bg-gradient-to-r from-[#fddb35] to-[#ffd700] hover:from-[#ffd700] hover:to-[#fddb35] text-[#1a0a2e] shadow-2xl hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-3 active:scale-95 rounded-2xl"
+            >
+              <Share2 className="w-5 h-5 sm:w-6 sm:h-6" />
+              <span>Share Now</span>
+            </Button>
+          </div>
 
-          <div className="relative">
+          <div className="relative my-4">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
+              <span className="w-full border-t border-white/30" />
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
+            <div className="relative flex justify-center text-xs sm:text-sm uppercase">
+              <span className="bg-transparent px-3 text-white/60 font-semibold">
                 Or share to
               </span>
             </div>
@@ -197,49 +214,51 @@ export const ShareButton = ({ courseName, courseId }: ShareButtonProps) => {
 
           {/* Social Media Buttons */}
           <div className="grid grid-cols-2 gap-3">
-            <Button
+            {/* Instagram */}
+            <button
               onClick={generateStoryCard}
-              variant="outline"
-              className="h-16 gap-2 flex-col border-2 hover:border-pink-500 hover:bg-pink-50"
               disabled={isGenerating}
+              className="h-20 sm:h-24 rounded-2xl bg-white/10 hover:bg-white/20 border-2 border-white/20 hover:border-pink-500/50 transition-all duration-300 flex flex-col items-center justify-center gap-2 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Instagram className="w-6 h-6 text-pink-600" />
-              <span className="text-sm font-semibold">
+              <Instagram className="w-7 h-7 sm:w-8 sm:h-8 text-pink-400" />
+              <span className="text-xs sm:text-sm font-bold text-white">
                 {isGenerating ? "Creating..." : "Instagram"}
               </span>
-            </Button>
+            </button>
 
-            <Button
+            {/* WhatsApp */}
+            <button
               onClick={() => handleSocialShare("whatsapp")}
-              variant="outline"
-              className="h-16 gap-2 flex-col border-2 hover:border-green-500 hover:bg-green-50"
+              className="h-20 sm:h-24 rounded-2xl bg-white/10 hover:bg-white/20 border-2 border-white/20 hover:border-green-500/50 transition-all duration-300 flex flex-col items-center justify-center gap-2 active:scale-95"
             >
-              <MessageCircle className="w-6 h-6 text-green-600" />
-              <span className="text-sm font-semibold">WhatsApp</span>
-            </Button>
+              <MessageCircle className="w-7 h-7 sm:w-8 sm:h-8 text-green-400" />
+              <span className="text-xs sm:text-sm font-bold text-white">WhatsApp</span>
+            </button>
 
-            <Button
+            {/* Facebook */}
+            <button
               onClick={() => handleSocialShare("facebook")}
-              variant="outline"
-              className="h-16 gap-2 flex-col border-2 hover:border-blue-500 hover:bg-blue-50"
+              className="h-20 sm:h-24 rounded-2xl bg-white/10 hover:bg-white/20 border-2 border-white/20 hover:border-blue-500/50 transition-all duration-300 flex flex-col items-center justify-center gap-2 active:scale-95"
             >
-              <Facebook className="w-6 h-6 text-blue-600" />
-              <span className="text-sm font-semibold">Facebook</span>
-            </Button>
+              <Facebook className="w-7 h-7 sm:w-8 sm:h-8 text-blue-400" />
+              <span className="text-xs sm:text-sm font-bold text-white">Facebook</span>
+            </button>
 
-            <Button
+            {/* Twitter */}
+            <button
               onClick={() => handleSocialShare("twitter")}
-              variant="outline"
-              className="h-16 gap-2 flex-col border-2 hover:border-sky-500 hover:bg-sky-50"
+              className="h-20 sm:h-24 rounded-2xl bg-white/10 hover:bg-white/20 border-2 border-white/20 hover:border-sky-500/50 transition-all duration-300 flex flex-col items-center justify-center gap-2 active:scale-95"
             >
-              <Twitter className="w-6 h-6 text-sky-600" />
-              <span className="text-sm font-semibold">Twitter</span>
-            </Button>
+              <Twitter className="w-7 h-7 sm:w-8 sm:h-8 text-sky-400" />
+              <span className="text-xs sm:text-sm font-bold text-white">Twitter</span>
+            </button>
           </div>
 
-          <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
-            <p className="text-sm text-center font-medium text-gray-700">
-              💙 Sharing helps other students discover Lincoln!
+          {/* Info Box */}
+          <div className="mt-4 p-4 bg-[#fddb35]/10 rounded-2xl border border-[#fddb35]/30">
+            <p className="text-sm sm:text-base text-center font-medium text-white/90 flex items-center justify-center gap-2">
+              <Sparkles className="w-4 h-4 text-[#fddb35]" />
+              Sharing helps other students discover Lincoln!
             </p>
           </div>
         </div>

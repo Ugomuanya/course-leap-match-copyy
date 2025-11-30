@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Mail, Heart, Send } from "lucide-react";
+import { Mail, Heart, Send, GraduationCap, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 interface EmailCaptureModalProps {
@@ -74,111 +74,146 @@ export const EmailCaptureModal = ({ isOpen, onClose, matchedCourses }: EmailCapt
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-xl sm:text-2xl flex items-center gap-2">
-            <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-red-500 fill-red-500" />
-            Amazing! You Found Your Match{matchedCourses.length > 1 ? 'es' : ''}!
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto bg-gradient-to-br from-[#cd1f80] via-[#a01866] to-[#1a0a2e] border-2 border-white/20 text-white">
+        <DialogHeader className="text-center space-y-3">
+          {/* Icon */}
+          <div className="flex justify-center">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-[#fddb35] to-[#ffd700] flex items-center justify-center shadow-2xl animate-bounce">
+              <Heart className="w-8 h-8 sm:w-10 sm:h-10 text-[#cd1f80] fill-[#cd1f80]" />
+            </div>
+          </div>
+
+          <DialogTitle className="text-xl sm:text-2xl md:text-3xl font-black text-white">
+            You Found {matchedCourses.length} Perfect {matchedCourses.length === 1 ? 'Match' : 'Matches'}! 🎓
           </DialogTitle>
-          <DialogDescription className="text-sm sm:text-base pt-2">
-            Want us to email you detailed information?
+          <DialogDescription className="text-white/80 text-sm sm:text-base">
+            Get detailed course information sent directly to your inbox
           </DialogDescription>
+
+          {/* University Badge */}
+          <div className="inline-flex items-center gap-2 bg-[#fddb35]/20 px-4 py-2 rounded-full border border-[#fddb35]/30 mx-auto">
+            <GraduationCap className="w-4 h-4 text-[#fddb35]" />
+            <span className="text-[#fddb35] text-xs sm:text-sm font-bold">University of Lincoln</span>
+          </div>
         </DialogHeader>
 
-        <div className="space-y-3 sm:space-y-4 py-2 sm:py-4">
+        <div className="space-y-4 py-4">
           {/* Matched Courses List */}
-          <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-4 space-y-2">
+          <div className="bg-white/10 rounded-2xl p-4 space-y-2.5 border border-white/20">
+            <p className="text-white font-bold text-sm mb-2 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-[#fddb35]" />
+              Your Matched Courses:
+            </p>
             {matchedCourses.slice(0, 3).map((course, index) => (
               <div key={index} className="flex items-start gap-2">
-                <Heart className="w-4 h-4 text-purple-600 fill-purple-600 mt-1 flex-shrink-0" />
-                <p className="text-sm font-semibold text-gray-700">{course.name}</p>
+                <Heart className="w-4 h-4 text-[#fddb35] fill-[#fddb35] mt-0.5 flex-shrink-0" />
+                <p className="text-sm sm:text-base text-white/90 leading-tight">{course.name}</p>
               </div>
             ))}
             {matchedCourses.length > 3 && (
-              <p className="text-xs text-gray-500 pl-6">+ {matchedCourses.length - 3} more course{matchedCourses.length - 3 > 1 ? 's' : ''}</p>
+              <p className="text-xs text-white/60 pl-6">+ {matchedCourses.length - 3} more {matchedCourses.length - 3 === 1 ? 'course' : 'courses'}</p>
             )}
           </div>
 
-          {/* Benefits - Compact */}
-          <div className="bg-blue-50 rounded-lg p-3 sm:p-4">
-            <p className="text-xs sm:text-sm text-gray-700 font-medium mb-2">We'll send you:</p>
-            <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm text-gray-600">
-              <div className="flex items-center gap-1">
-                <span className="text-green-500">✓</span>
-                Course details
+          {/* Benefits */}
+          <div className="bg-[#fddb35]/10 rounded-2xl p-4 border border-[#fddb35]/30">
+            <p className="text-white font-bold text-sm mb-3">We'll email you:</p>
+            <div className="grid grid-cols-2 gap-2.5 text-sm text-white/90">
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded-full bg-[#fddb35] flex items-center justify-center flex-shrink-0">
+                  <span className="text-[#1a0a2e] text-xs font-bold">✓</span>
+                </div>
+                <span>Course details</span>
               </div>
-              <div className="flex items-center gap-1">
-                <span className="text-green-500">✓</span>
-                Open days
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded-full bg-[#fddb35] flex items-center justify-center flex-shrink-0">
+                  <span className="text-[#1a0a2e] text-xs font-bold">✓</span>
+                </div>
+                <span>Open days</span>
               </div>
-              <div className="flex items-center gap-1">
-                <span className="text-green-500">✓</span>
-                Entry requirements
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded-full bg-[#fddb35] flex items-center justify-center flex-shrink-0">
+                  <span className="text-[#1a0a2e] text-xs font-bold">✓</span>
+                </div>
+                <span>Entry requirements</span>
               </div>
-              <div className="flex items-center gap-1">
-                <span className="text-green-500">✓</span>
-                Application tips
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded-full bg-[#fddb35] flex items-center justify-center flex-shrink-0">
+                  <span className="text-[#1a0a2e] text-xs font-bold">✓</span>
+                </div>
+                <span>Application tips</span>
               </div>
             </div>
           </div>
 
           {/* Email Input */}
-          <div className="space-y-1.5">
+          <div className="space-y-2">
+            <label htmlFor="email" className="text-white font-semibold text-sm block">
+              Your Email Address
+            </label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <Input
                 id="email"
                 type="email"
                 placeholder="your.email@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="pl-9 sm:pl-10 h-10 sm:h-11 text-sm sm:text-base"
+                onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+                className="pl-10 h-12 text-base bg-white/90 border-2 border-white/30 focus:border-[#fddb35] focus:ring-4 focus:ring-[#fddb35]/20 rounded-xl"
                 disabled={isSubmitting}
+                autoFocus
               />
             </div>
           </div>
 
           {/* GDPR Consent */}
-          <div className="flex items-start space-x-2 bg-gray-50 p-2.5 sm:p-3 rounded-lg">
+          <div className="flex items-start space-x-3 bg-white/10 p-3 rounded-xl border border-white/20">
             <Checkbox
               id="consent"
               checked={consent}
               onCheckedChange={(checked) => setConsent(checked as boolean)}
               disabled={isSubmitting}
-              className="mt-0.5"
+              className="mt-1 border-white/40 data-[state=checked]:bg-[#fddb35] data-[state=checked]:border-[#fddb35]"
             />
             <label
               htmlFor="consent"
-              className="text-xs leading-snug cursor-pointer text-gray-600"
+              className="text-xs sm:text-sm leading-relaxed cursor-pointer text-white/90"
             >
-              I agree to receive course info from University of Lincoln. Unsubscribe anytime.
+              I agree to receive course information from University of Lincoln. You can unsubscribe anytime.
             </label>
           </div>
 
           {/* Action Buttons */}
-          <div className="space-y-2 pt-1">
-            <Button
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-              className="w-full h-10 sm:h-11 text-sm sm:text-base font-bold bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
-            >
-              {isSubmitting ? (
-                <>
-                  <Send className="w-4 h-4 sm:w-5 sm:h-5 animate-pulse" />
-                  Sending...
-                </>
-              ) : (
-                <>
-                  <Send className="w-4 h-4 sm:w-5 sm:h-5" />
-                  Send Me Info
-                </>
-              )}
-            </Button>
+          <div className="space-y-3 pt-2">
+            {/* Primary CTA */}
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-[#fddb35] to-[#ffd700] rounded-2xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity duration-300"></div>
+              <Button
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="relative w-full h-12 sm:h-14 text-base sm:text-lg font-bold bg-gradient-to-r from-[#fddb35] to-[#ffd700] hover:from-[#ffd700] hover:to-[#fddb35] text-[#1a0a2e] shadow-2xl hover:scale-[1.02] transition-all duration-300 active:scale-95 rounded-2xl"
+                aria-label="Send me course information"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Send className="w-5 h-5 animate-pulse" />
+                    <span>Sending...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-5 h-5" />
+                    <span>Send Me Course Info</span>
+                  </>
+                )}
+              </Button>
+            </div>
 
+            {/* Secondary CTA */}
             <Button
               onClick={handleMaybeLater}
               variant="ghost"
-              className="w-full h-9 text-xs sm:text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100"
+              className="w-full h-10 sm:h-12 text-sm sm:text-base text-white/80 hover:text-white hover:bg-white/10 rounded-xl"
               disabled={isSubmitting}
             >
               Maybe Later
