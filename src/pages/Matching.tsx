@@ -57,8 +57,36 @@ const Matching = () => {
 
   const childRefs = useRef<any[]>(suggestedCourses.map(() => React.createRef()));
 
+  // Check if matching session was previously completed
+  useEffect(() => {
+    const matchingCompleted = localStorage.getItem("matchingCompleted") === "true";
+    const storedMatches = localStorage.getItem("matchedCourses");
+
+    if (matchingCompleted && storedMatches) {
+      // User already completed matching - restore their state and skip to completion screen
+      try {
+        const matches = JSON.parse(storedMatches);
+        setSelectedCourses(matches);
+        setCurrentIndex(suggestedCourses.length); // Set to end (completion screen)
+        setShowResult(true); // Show results immediately
+        return; // Skip loading animation
+      } catch (error) {
+        console.error("Error restoring matches:", error);
+        // Clear corrupted data and proceed normally
+        localStorage.removeItem("matchingCompleted");
+        localStorage.removeItem("matchedCourses");
+      }
+    }
+  }, [suggestedCourses.length]);
+
   // Animated loading with progress - only show on first visit
   useEffect(() => {
+    // Skip loading if returning to completed session
+    const matchingCompleted = localStorage.getItem("matchingCompleted") === "true";
+    if (matchingCompleted) {
+      return;
+    }
+
     // If already seen loading, skip animation and show results immediately
     if (hasSeenLoading === "true") {
       setShowResult(true);
@@ -146,7 +174,18 @@ const Matching = () => {
     }
 
     setTimeout(() => {
-      setCurrentIndex(prev => prev + 1);
+      setCurrentIndex(prev => {
+        const newIndex = prev + 1;
+
+        // Check if this was the last card
+        if (newIndex >= suggestedCourses.length) {
+          // Mark matching as completed
+          localStorage.setItem("matchingCompleted", "true");
+          localStorage.setItem("matchingCompletedAt", new Date().toISOString());
+        }
+
+        return newIndex;
+      });
       setLastDirection(null);
     }, 600);
   };
@@ -225,6 +264,9 @@ const Matching = () => {
 
   const handleSkipAll = () => {
     setCurrentIndex(suggestedCourses.length);
+    // Mark matching as completed when skipping to end
+    localStorage.setItem("matchingCompleted", "true");
+    localStorage.setItem("matchingCompletedAt", new Date().toISOString());
   };
 
   const handleChat = () => {
@@ -618,7 +660,8 @@ const Matching = () => {
                 className="h-12 sm:h-14 px-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base bg-white/15 hover:bg-white/25 active:bg-white/35 text-white border-2 border-white/40 hover:border-white/50 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg active:scale-95"
               >
                 <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span>Restart</span>
+                <span className="hidden sm:inline">Start Fresh</span>
+                <span className="sm:hidden">Restart</span>
               </button>
             </div>
           </div>
