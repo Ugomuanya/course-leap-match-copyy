@@ -6,6 +6,7 @@ import { getCoursesBySubject, searchCoursesByInterests, type Course } from "@/da
 import TinderCard from "react-tinder-card";
 import { ShareButton } from "@/components/ShareButton";
 import { EmailCaptureModal } from "@/components/EmailCaptureModal";
+import { InlineEmailCapture } from "@/components/InlineEmailCapture";
 import { MatchToast } from "@/components/MatchToast";
 import { FirstMatchModal } from "@/components/FirstMatchModal";
 import confetti from "canvas-confetti";
@@ -116,31 +117,40 @@ const Matching = () => {
     };
   }, []);
 
-  // Show email modal ONLY when matching is complete (on completion screen)
-  // NOT during active swiping, NOT when other modals are open
+  // Exit intent detection - Show email modal when user tries to leave (fallback)
   useEffect(() => {
-    // Only trigger if we're on the completion screen (all cards reviewed)
     const isCompletionScreen = currentIndex >= suggestedCourses.length;
     const hasMatches = selectedCourses.length > 0;
     const hasEmail = localStorage.getItem("userEmail");
 
-    // CRITICAL: Do NOT show email modal if FirstMatchModal is open!
-    // This prevents both modals from appearing at the same time
-    if (showFirstMatchModal) {
-      return; // Exit early if FirstMatchModal is showing
+    // Only set up exit intent if user is on completion screen with matches and no email
+    if (!isCompletionScreen || !hasMatches || hasEmail || showFirstMatchModal) {
+      return;
     }
 
-    // ONLY show email modal if:
-    // 1. User finished all cards (completion screen)
-    // 2. User has at least one match
-    // 3. User hasn't provided email yet
-    // 4. No other modals are open (FirstMatchModal)
-    if (isCompletionScreen && hasMatches && !hasEmail) {
-      const timer = setTimeout(() => {
+    // Exit intent: detect when mouse leaves viewport (desktop)
+    const handleMouseLeave = (e: MouseEvent) => {
+      // Only trigger if mouse is leaving from top (near browser controls)
+      if (e.clientY <= 10 && !hasEmail) {
         setShowEmailModal(true);
-      }, 2500);
-      return () => clearTimeout(timer);
-    }
+      }
+    };
+
+    // Mobile: detect when user tries to navigate away
+    const handleBeforeUnload = () => {
+      if (!localStorage.getItem("userEmail")) {
+        // Modal will show, but user is leaving anyway
+        setShowEmailModal(true);
+      }
+    };
+
+    document.addEventListener('mouseleave', handleMouseLeave);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      document.removeEventListener('mouseleave', handleMouseLeave);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
   }, [currentIndex, suggestedCourses.length, selectedCourses.length, showFirstMatchModal]);
 
   const onSwipe = (direction: string, course: Course) => {
@@ -633,6 +643,16 @@ const Matching = () => {
                   No courses selected. Try swiping right to match!
                 </p>
               </div>
+            )}
+
+            {/* Inline Email Capture - Non-intrusive, part of natural flow */}
+            {selectedCourses.length > 0 && (
+              <InlineEmailCapture
+                matchedCourses={selectedCourses}
+                onEmailSubmitted={() => {
+                  // Email captured successfully via inline form
+                }}
+              />
             )}
 
             {/* Share Button */}
