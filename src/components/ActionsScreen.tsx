@@ -32,16 +32,17 @@ export const ActionsScreen = ({
 
       {/* Actions Container - Scrollable if needed */}
       <div className="flex-1 overflow-y-auto px-4 pb-6">
-        <div className="max-w-2xl mx-auto space-y-4">
-          {/* Primary CTA - Explore Matches */}
+        <div className="max-w-2xl mx-auto space-y-5">
+          {/* Primary CTA - Explore Matches - HIGH CONTRAST */}
           {selectedCourses.length > 0 ? (
-            <div className="relative group animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="absolute inset-0 bg-gradient-to-r from-[#fddb35] to-[#ffd700] rounded-xl sm:rounded-2xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity duration-300"></div>
+            <div className="relative group animate-in fade-in slide-in-from-bottom-4 duration-500 mt-2">
+              {/* Glowing yellow background for visibility */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-[#fddb35] to-[#ffd700] rounded-2xl sm:rounded-3xl blur-xl opacity-75 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
               <button
                 onClick={onViewMatches}
-                className="relative w-full h-14 sm:h-16 px-6 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg md:text-xl bg-gradient-to-r from-[#cd1f80] to-[#a01866] hover:from-[#a01866] hover:to-[#cd1f80] text-white shadow-2xl hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-2 active:scale-95"
+                className="relative w-full h-16 sm:h-20 px-6 sm:px-8 rounded-2xl sm:rounded-3xl font-black text-lg sm:text-xl md:text-2xl bg-gradient-to-r from-[#fddb35] to-[#ffd700] hover:from-[#ffd700] hover:to-[#fddb35] text-[#1a0a2e] shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3 active:scale-95 border-4 border-white/30"
               >
-                <Heart className="w-5 h-5 sm:w-6 sm:h-6 fill-white" />
+                <Heart className="w-6 h-6 sm:w-8 sm:h-8 fill-[#cd1f80]" />
                 <span>Explore My {matchCount} {matchCount === 1 ? 'Match' : 'Matches'}</span>
               </button>
             </div>
