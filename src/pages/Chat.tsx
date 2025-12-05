@@ -97,7 +97,20 @@ const Chat = () => {
   };
 
   const handleBack = () => {
-    navigate("/course-details");
+    // Smart navigation: check if user has matched courses and matching is complete
+    const matchingCompleted = localStorage.getItem("matchingCompleted") === "true";
+    const hasMatchedCourses = localStorage.getItem("matchedCourses");
+
+    if (matchingCompleted && hasMatchedCourses) {
+      // User completed matching - return to matching completion screen (with memory preserved)
+      navigate("/matching");
+    } else if (hasMatchedCourses) {
+      // User has matches but didn't complete full flow - go to course details
+      navigate("/course-details");
+    } else {
+      // No matches - return to matching to start over
+      navigate("/matching");
+    }
   };
 
   const quickQuestions = [

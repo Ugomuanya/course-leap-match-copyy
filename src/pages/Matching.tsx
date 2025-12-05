@@ -7,6 +7,8 @@ import TinderCard from "react-tinder-card";
 import { ShareButton } from "@/components/ShareButton";
 import { EmailCaptureModal } from "@/components/EmailCaptureModal";
 import { InlineEmailCapture } from "@/components/InlineEmailCapture";
+import { CelebrationScreen } from "@/components/CelebrationScreen";
+import { ActionsScreen } from "@/components/ActionsScreen";
 import { MatchToast } from "@/components/MatchToast";
 import { FirstMatchModal } from "@/components/FirstMatchModal";
 import confetti from "canvas-confetti";
@@ -25,6 +27,7 @@ const Matching = () => {
   const [toastCourse, setToastCourse] = useState<Course | null>(null);
   const [showFirstMatchModal, setShowFirstMatchModal] = useState(false);
   const [firstMatchCourse, setFirstMatchCourse] = useState<Course | null>(null);
+  const [showCelebration, setShowCelebration] = useState(true); // Two-screen flow: celebration first
   const navigate = useNavigate();
   const subject = localStorage.getItem("selectedSubject") || "Business and Management";
   const name = localStorage.getItem("studentName") || "Student";
@@ -69,6 +72,7 @@ const Matching = () => {
         const matches = JSON.parse(storedMatches);
         setSelectedCourses(matches);
         setCurrentIndex(suggestedCourses.length); // Set to end (completion screen)
+        setShowCelebration(false); // Skip celebration, go straight to actions
         setShowResult(true); // Show results immediately
         return; // Skip loading animation
       } catch (error) {
@@ -407,24 +411,26 @@ const Matching = () => {
         {/* Card Stack Container */}
         <div className="relative w-full max-w-md mx-auto mb-6 sm:mb-8" style={{ height: 'clamp(550px, 75vh, 650px)' }}>
           {currentIndex >= suggestedCourses.length ? (
-            // Completion State
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center space-y-6 animate-in fade-in zoom-in duration-700">
-                <div className="relative w-32 h-32 mx-auto">
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#fddb35] to-[#ffd700] animate-pulse"></div>
-                  <div className="absolute inset-2 rounded-full bg-white flex items-center justify-center">
-                    <Heart className="w-16 h-16 text-[#cd1f80] fill-[#cd1f80] animate-bounce" />
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-2xl sm:text-3xl font-black text-white mb-2">
-                    All courses reviewed!
-                  </h3>
-                  <p className="text-white/90 text-base sm:text-lg">
-                    You matched with <span className="text-[#fddb35] font-bold">{selectedCourses.length}</span> {selectedCourses.length === 1 ? 'course' : 'courses'}
-                  </p>
-                </div>
-              </div>
+            // TWO-SCREEN COMPLETION FLOW
+            <div className="absolute inset-0">
+              {showCelebration ? (
+                // Screen 1: Pure Celebration
+                <CelebrationScreen
+                  name={name}
+                  matchCount={selectedCourses.length}
+                  onContinue={() => setShowCelebration(false)}
+                  autoAdvanceDelay={3000}
+                />
+              ) : (
+                // Screen 2: Actions Hub
+                <ActionsScreen
+                  matchCount={selectedCourses.length}
+                  selectedCourses={selectedCourses}
+                  onViewMatches={handleViewCourses}
+                  onChat={handleChat}
+                  onRestart={handleRestart}
+                />
+              )}
             </div>
           ) : (
             // Swipeable Card Stack
@@ -622,70 +628,7 @@ const Matching = () => {
           </div>
         )}
 
-        {/* Action Buttons - AFTER MATCHING */}
-        {currentIndex >= suggestedCourses.length && (
-          <div className="space-y-4 animate-in fade-in slide-in-from-bottom-6 duration-700">
-            {/* Primary CTA */}
-            {selectedCourses.length > 0 ? (
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-r from-[#fddb35] to-[#ffd700] rounded-xl sm:rounded-2xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity duration-300"></div>
-                <button
-                  onClick={handleViewCourses}
-                  className="relative w-full h-14 sm:h-16 px-6 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg md:text-xl bg-gradient-to-r from-[#cd1f80] to-[#a01866] hover:from-[#a01866] hover:to-[#cd1f80] text-white shadow-2xl hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-2 active:scale-95"
-                >
-                  <Heart className="w-5 h-5 sm:w-6 sm:h-6 fill-white" />
-                  <span>Explore My {selectedCourses.length} {selectedCourses.length === 1 ? 'Match' : 'Matches'}</span>
-                </button>
-              </div>
-            ) : (
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
-                <p className="text-white/90 text-center">
-                  No courses selected. Try swiping right to match!
-                </p>
-              </div>
-            )}
-
-            {/* Inline Email Capture - Non-intrusive, part of natural flow */}
-            {selectedCourses.length > 0 && (
-              <InlineEmailCapture
-                matchedCourses={selectedCourses}
-                onEmailSubmitted={() => {
-                  // Email captured successfully via inline form
-                }}
-              />
-            )}
-
-            {/* Share Button */}
-            {selectedCourses.length > 0 && (
-              <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000">
-                <ShareButton
-                  courseName={selectedCourses[0]?.name || "My Course Match"}
-                  courseId={selectedCourses[0]?.name.toLowerCase().replace(/\s+/g, '-')}
-                />
-              </div>
-            )}
-
-            {/* Secondary Actions */}
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                onClick={handleChat}
-                className="h-12 sm:h-14 px-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base bg-[#fddb35] hover:bg-[#ffd700] text-[#1a0a2e] shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 active:scale-95"
-              >
-                <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span>Chat</span>
-              </button>
-
-              <button
-                onClick={handleRestart}
-                className="h-12 sm:h-14 px-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base bg-white/15 hover:bg-white/25 active:bg-white/35 text-white border-2 border-white/40 hover:border-white/50 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg active:scale-95"
-              >
-                <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="hidden sm:inline">Start Fresh</span>
-                <span className="sm:hidden">Restart</span>
-              </button>
-            </div>
-          </div>
-        )}
+        {/* Action buttons now integrated into ActionsScreen component above */}
       </div>
 
       {/* Email Capture Modal */}
