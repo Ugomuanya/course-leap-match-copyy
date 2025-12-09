@@ -499,57 +499,54 @@ const Matching = () => {
                         </div>
                       </div>
 
-                      {/* Card Content */}
-                      <div className="relative h-full flex flex-col justify-between p-6 sm:p-8 text-white z-10">
-                        {/* Top Section - Course Title */}
-                        <div className="space-y-3">
-                          <div className="inline-flex items-center gap-2 bg-[#fddb35]/30 px-3 py-1 rounded-full border border-[#fddb35]/50">
-                            <GraduationCap className="w-4 h-4 text-[#fddb35]" />
-                            <span className="text-[#fddb35] text-xs sm:text-sm font-bold">University of Lincoln</span>
-                          </div>
-                          <h3 className="text-2xl sm:text-3xl md:text-4xl font-black text-white drop-shadow-lg leading-tight">
-                            {course.name}
-                          </h3>
+                    <div className="relative h-full flex flex-col justify-between p-6 sm:p-8 text-white z-10">
+                      {/* Top Section - Course Title */}
+                      <div className="space-y-3">
+                        <div className="inline-flex items-center gap-2 bg-[#fddb35]/30 px-3 py-1 rounded-full border border-[#fddb35]/50">
+                          <GraduationCap className="w-4 h-4 text-[#fddb35]" />
+                          <span className="text-[#fddb35] text-xs sm:text-sm font-bold">University of Lincoln</span>
                         </div>
-
-                        {/* Bottom Section - Course Details */}
-                        <div className="space-y-4">
-                          <p className="text-sm sm:text-base text-white/90 leading-relaxed line-clamp-3">
-                            {course.description}
-                          </p>
-
-                          {/* Interest Tags */}
-                          <div className="flex flex-wrap gap-2">
-                            {course.interests.slice(0, 4).map((interest, i) => (
-                              <div key={i} className="bg-white/25 rounded-full px-3 py-1 border border-white/40">
-                                <p className="text-xs sm:text-sm font-semibold">{interest}</p>
-                              </div>
-                            ))}
-                          </div>
-
-                          {/* Entry Requirements */}
-                          {course.entryGrades && (
-                            <div className="inline-flex items-center gap-2 bg-[#cd1f80]/40 rounded-full px-4 py-2 border border-[#cd1f80]/60">
-                              <Sparkles className="w-4 h-4 text-[#fddb35]" />
-                              <p className="text-sm sm:text-base font-bold">Entry: {course.entryGrades} UCAS points</p>
-                            </div>
-                          )}
-
-                          {/* View Details Link */}
-                          {course.link && (
-                            <a
-                              href={course.link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                              className="inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 active:bg-white/35 rounded-full px-4 py-2 border border-white/40 transition-all duration-300 group"
-                            >
-                              <span className="text-sm sm:text-base font-semibold">View Full Details</span>
-                              <ExternalLink className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                            </a>
-                          )}
-                        </div>
+                        <h3 className="text-2xl sm:text-3xl md:text-4xl font-black text-white drop-shadow-lg leading-tight">
+                          {course.name}
+                        </h3>
                       </div>
+                      {/* Bottom Section - Course Details */}
+                      <div className="space-y-4">
+                        <p className="text-sm sm:text-base text-white/90 leading-relaxed line-clamp-3">
+                          {course.description}
+                        </p>
+                        {/* Interest Tags */}
+                        <div className="flex flex-wrap gap-2">
+                          {course.interests.slice(0, 4).map((interest, i) => (
+                            <div key={i} className="bg-white/25 rounded-full px-3 py-1 border border-white/40">
+                              <p className="text-xs sm:text-sm font-semibold">{interest}</p>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Entry Requirements */}
+                        {course.entryGrades && (
+                          <div className="inline-flex items-center gap-2 bg-[#cd1f80]/40 backdrop-blur-sm rounded-full px-4 py-2 border border-[#cd1f80]/60">
+                            <Sparkles className="w-4 h-4 text-[#fddb35]" />
+                            <p className="text-sm sm:text-base font-bold">Entry: {course.entryGrades} UCAS points</p>
+                          </div>
+                        )}
+
+                        {/* View Details Link */}
+                        {course.link && (
+                          <a
+                            href={course.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm hover:bg-white/25 active:bg-white/35 rounded-full px-4 py-2 border border-white/40 transition-all duration-300 group"
+                          >
+                            <span className="text-sm sm:text-base font-semibold">View Full Details</span>
+                            <ExternalLink className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                          </a>
+                        )}
+                      </div>
+                    </div>
                     </div>
                   </TinderCard>
                 );

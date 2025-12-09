@@ -146,7 +146,9 @@ const CourseDetails = () => {
               <div className="flex justify-center mb-6">
                 <div className="inline-flex items-center gap-2 bg-[#fddb35]/20 px-4 py-2 rounded-full border border-[#fddb35]/40">
                   <GraduationCap className="w-4 h-4 text-[#fddb35]" />
-                  <span className="text-[#fddb35] text-xs sm:text-sm font-bold">University of Lincoln</span>
+                  <span className="text-[#fddb35] text-xs sm:text-sm font-bold">
+                    University of Lincoln
+                  </span>
                 </div>
               </div>
 
@@ -217,13 +219,17 @@ const CourseDetails = () => {
                   <div className="flex items-start gap-3">
                     <TrendingUp className="w-5 h-5 text-[#fddb35] flex-shrink-0 mt-0.5" />
                     <p className="text-white/90 text-sm sm:text-base">
-                      <span className="font-semibold text-[#fddb35]">95%</span> of graduates employed within 6 months
+                      <span className="font-semibold text-[#fddb35]">95%</span>{" "}
+                      of graduates employed within 6 months
                     </p>
                   </div>
                   <div className="flex items-start gap-3">
                     <TrendingUp className="w-5 h-5 text-[#fddb35] flex-shrink-0 mt-0.5" />
                     <p className="text-white/90 text-sm sm:text-base">
-                      Average starting salary: <span className="font-semibold text-[#fddb35]">£28,000</span>
+                      Average starting salary:{" "}
+                      <span className="font-semibold text-[#fddb35]">
+                        £28,000
+                      </span>
                     </p>
                   </div>
                 </div>
@@ -238,10 +244,12 @@ const CourseDetails = () => {
                 <div className="relative aspect-video bg-black/20 rounded-xl overflow-hidden">
                   <iframe
                     className="absolute inset-0 w-full h-full"
-                    src="https://www.youtube.com/embed/Mm7-JZ8xAKk"
-                    title="University of Lincoln - Campus Tour"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
+                    src="https://www.youtube.com/embed/4aset4B1CE8?si=tqr2W0sLsBkRTulY"
+                    title="YouTube video player"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    allowfullscreen
                   ></iframe>
                 </div>
               </div>
@@ -253,15 +261,20 @@ const CourseDetails = () => {
                   Student Voice
                 </h3>
                 <p className="text-white/80 text-sm sm:text-base leading-relaxed mb-4 italic">
-                  "The hands-on approach and industry connections at Lincoln gave me the skills to land my dream job before graduation!"
+                  "The hands-on approach and industry connections at Lincoln
+                  gave me the skills to land my dream job before graduation!"
                 </p>
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#fddb35] to-[#ffd700] flex items-center justify-center">
                     <span className="text-[#1a0a2e] font-bold text-lg">SM</span>
                   </div>
                   <div>
-                    <p className="text-white font-semibold text-sm">Sarah Mitchell</p>
-                    <p className="text-white/60 text-xs">Class of 2023 • Software Engineer at Google</p>
+                    <p className="text-white font-semibold text-sm">
+                      Sarah Mitchell
+                    </p>
+                    <p className="text-white/60 text-xs">
+                      Class of 2023 • Software Engineer at Google
+                    </p>
                   </div>
                 </div>
               </div>
@@ -287,31 +300,40 @@ const CourseDetails = () => {
                   <div className="px-5 pb-5 space-y-3 animate-in slide-in-from-top-2 duration-300">
                     <div className="bg-white/5 rounded-xl p-4">
                       <h4 className="text-white font-semibold text-sm sm:text-base mb-2 flex items-center gap-2">
-                        <span className="w-6 h-6 rounded-full bg-[#fddb35] flex items-center justify-center text-[#1a0a2e] text-xs font-bold">1</span>
+                        <span className="w-6 h-6 rounded-full bg-[#fddb35] flex items-center justify-center text-[#1a0a2e] text-xs font-bold">
+                          1
+                        </span>
                         Year 1: Foundation
                       </h4>
                       <p className="text-white/70 text-xs sm:text-sm">
-                        Build core knowledge with introductory modules and develop fundamental skills.
+                        Build core knowledge with introductory modules and
+                        develop fundamental skills.
                       </p>
                     </div>
 
                     <div className="bg-white/5 rounded-xl p-4">
                       <h4 className="text-white font-semibold text-sm sm:text-base mb-2 flex items-center gap-2">
-                        <span className="w-6 h-6 rounded-full bg-[#fddb35] flex items-center justify-center text-[#1a0a2e] text-xs font-bold">2</span>
+                        <span className="w-6 h-6 rounded-full bg-[#fddb35] flex items-center justify-center text-[#1a0a2e] text-xs font-bold">
+                          2
+                        </span>
                         Year 2: Development
                       </h4>
                       <p className="text-white/70 text-xs sm:text-sm">
-                        Apply knowledge through practical projects and industry placements.
+                        Apply knowledge through practical projects and industry
+                        placements.
                       </p>
                     </div>
 
                     <div className="bg-white/5 rounded-xl p-4">
                       <h4 className="text-white font-semibold text-sm sm:text-base mb-2 flex items-center gap-2">
-                        <span className="w-6 h-6 rounded-full bg-[#fddb35] flex items-center justify-center text-[#1a0a2e] text-xs font-bold">3</span>
+                        <span className="w-6 h-6 rounded-full bg-[#fddb35] flex items-center justify-center text-[#1a0a2e] text-xs font-bold">
+                          3
+                        </span>
                         Year 3: Mastery
                       </h4>
                       <p className="text-white/70 text-xs sm:text-sm">
-                        Complete your dissertation and prepare for your professional career.
+                        Complete your dissertation and prepare for your
+                        professional career.
                       </p>
                     </div>
                   </div>
@@ -356,7 +378,7 @@ const CourseDetails = () => {
               <div className="sm:col-span-1">
                 <ShareButton
                   courseName={course.name}
-                  courseId={course.name.toLowerCase().replace(/\s+/g, '-')}
+                  courseId={course.name.toLowerCase().replace(/\s+/g, "-")}
                 />
               </div>
             </div>
@@ -406,7 +428,9 @@ const CourseDetails = () => {
                 </div>
                 <div>
                   <p className="text-white font-semibold">You've matched!</p>
-                  <p className="text-white/70 text-sm">Found your perfect course at Lincoln</p>
+                  <p className="text-white/70 text-sm">
+                    Found your perfect course at Lincoln
+                  </p>
                 </div>
               </div>
 
@@ -416,7 +440,9 @@ const CourseDetails = () => {
                 </div>
                 <div>
                   <p className="text-white font-semibold">Explore details</p>
-                  <p className="text-white/70 text-sm">Review requirements and structure</p>
+                  <p className="text-white/70 text-sm">
+                    Review requirements and structure
+                  </p>
                 </div>
               </div>
 
@@ -426,7 +452,9 @@ const CourseDetails = () => {
                 </div>
                 <div>
                   <p className="text-white font-semibold">Apply via UCAS</p>
-                  <p className="text-white/70 text-sm">Submit your application</p>
+                  <p className="text-white/70 text-sm">
+                    Submit your application
+                  </p>
                 </div>
               </div>
 
@@ -436,7 +464,9 @@ const CourseDetails = () => {
                 </div>
                 <div>
                   <p className="text-white font-semibold">Start your journey</p>
-                  <p className="text-white/70 text-sm">Begin at University of Lincoln</p>
+                  <p className="text-white/70 text-sm">
+                    Begin at University of Lincoln
+                  </p>
                 </div>
               </div>
             </div>
