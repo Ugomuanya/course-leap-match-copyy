@@ -12,7 +12,6 @@ import {
   Calendar,
   BookOpen,
   ArrowRight,
-  Mail,
   Briefcase,
   TrendingUp,
   ChevronDown,
@@ -20,13 +19,12 @@ import {
   Play,
   Users
 } from "lucide-react";
-import { EmailCaptureModal } from "@/components/EmailCaptureModal";
+import { OpenDaysButton } from "@/components/OpenDaysButton";
 import { ShareButton } from "@/components/ShareButton";
 import type { Course } from "@/data/coursesData";
 
 const CourseDetails = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [showEmailModal, setShowEmailModal] = useState(false);
   const [matchedCourses, setMatchedCourses] = useState<Course[]>([]);
   const [showCourseStructure, setShowCourseStructure] = useState(false);
   const navigate = useNavigate();
@@ -64,10 +62,6 @@ const CourseDetails = () => {
     if (course.link) {
       window.open(course.link, "_blank", "noopener,noreferrer");
     }
-  };
-
-  const handleEmailClick = () => {
-    setShowEmailModal(true);
   };
 
   const handleChatWithAdvisor = () => {
@@ -359,13 +353,11 @@ const CourseDetails = () => {
 
             {/* Secondary Actions Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <button
-                onClick={handleEmailClick}
-                className="h-14 rounded-xl font-semibold text-sm sm:text-base bg-white/10 hover:bg-white/20 text-white border border-white/30 hover:border-white/40 transition-all duration-300 flex items-center justify-center gap-2 active:scale-95"
-              >
-                <Mail className="w-5 h-5" />
-                <span>Get Info</span>
-              </button>
+              <OpenDaysButton
+                variant="secondary"
+                size="md"
+                className="w-full"
+              />
 
               <button
                 onClick={handleChatWithAdvisor}
@@ -473,13 +465,6 @@ const CourseDetails = () => {
           </div>
         </div>
       </div>
-
-      {/* Email Capture Modal */}
-      <EmailCaptureModal
-        isOpen={showEmailModal}
-        onClose={() => setShowEmailModal(false)}
-        matchedCourses={[course]}
-      />
     </div>
   );
 };

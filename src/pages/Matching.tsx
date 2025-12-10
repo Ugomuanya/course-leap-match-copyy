@@ -5,8 +5,6 @@ import { Heart, MessageCircle, RotateCcw, ExternalLink, X, Sparkles, GraduationC
 import { getCoursesBySubject, searchCoursesByInterests, type Course } from "@/data/coursesData";
 import TinderCard from "react-tinder-card";
 import { ShareButton } from "@/components/ShareButton";
-import { EmailCaptureModal } from "@/components/EmailCaptureModal";
-import { InlineEmailCapture } from "@/components/InlineEmailCapture";
 import { CelebrationScreen } from "@/components/CelebrationScreen";
 import { ActionsScreen } from "@/components/ActionsScreen";
 import { MatchToast } from "@/components/MatchToast";
@@ -21,7 +19,6 @@ const Matching = () => {
   const [selectedCourses, setSelectedCourses] = useState<Course[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [lastDirection, setLastDirection] = useState<string | null>(null);
-  const [showEmailModal, setShowEmailModal] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [showToast, setShowToast] = useState(false);
   const [toastCourse, setToastCourse] = useState<Course | null>(null);
@@ -121,41 +118,7 @@ const Matching = () => {
     };
   }, []);
 
-  // Exit intent detection - Show email modal when user tries to leave (fallback)
-  useEffect(() => {
-    const isCompletionScreen = currentIndex >= suggestedCourses.length;
-    const hasMatches = selectedCourses.length > 0;
-    const hasEmail = localStorage.getItem("userEmail");
-
-    // Only set up exit intent if user is on completion screen with matches and no email
-    if (!isCompletionScreen || !hasMatches || hasEmail || showFirstMatchModal) {
-      return;
-    }
-
-    // Exit intent: detect when mouse leaves viewport (desktop)
-    const handleMouseLeave = (e: MouseEvent) => {
-      // Only trigger if mouse is leaving from top (near browser controls)
-      if (e.clientY <= 10 && !hasEmail) {
-        setShowEmailModal(true);
-      }
-    };
-
-    // Mobile: detect when user tries to navigate away
-    const handleBeforeUnload = () => {
-      if (!localStorage.getItem("userEmail")) {
-        // Modal will show, but user is leaving anyway
-        setShowEmailModal(true);
-      }
-    };
-
-    document.addEventListener('mouseleave', handleMouseLeave);
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
-    return () => {
-      document.removeEventListener('mouseleave', handleMouseLeave);
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, [currentIndex, suggestedCourses.length, selectedCourses.length, showFirstMatchModal]);
+  // Removed exit-intent email capture per employer requirements
 
   const onSwipe = (direction: string, course: Course) => {
     setLastDirection(direction);
@@ -270,8 +233,6 @@ const Matching = () => {
   const handleViewCourses = () => {
     if (selectedCourses.length > 0) {
       localStorage.setItem("matchedCourses", JSON.stringify(selectedCourses));
-      // Close email modal if it's queued (prevent it from showing)
-      setShowEmailModal(false);
       navigate("/course-details");
     }
   };
@@ -296,8 +257,6 @@ const Matching = () => {
   const handleViewMatchFromModal = () => {
     // Save matches and navigate to course details
     localStorage.setItem("matchedCourses", JSON.stringify(selectedCourses));
-    // Close email modal if it's queued (prevent it from showing)
-    setShowEmailModal(false);
     navigate("/course-details");
   };
 
@@ -627,13 +586,6 @@ const Matching = () => {
 
         {/* Action buttons now integrated into ActionsScreen component above */}
       </div>
-
-      {/* Email Capture Modal */}
-      <EmailCaptureModal
-        isOpen={showEmailModal}
-        onClose={() => setShowEmailModal(false)}
-        matchedCourses={selectedCourses}
-      />
 
       {/* Toast Notification for Subsequent Matches */}
       {showToast && toastCourse && (

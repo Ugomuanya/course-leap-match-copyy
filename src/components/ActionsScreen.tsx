@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Heart, MessageCircle, RotateCcw, ChevronLeft, ChevronRight } from "lucide-react";
-import { InlineEmailCapture } from "@/components/InlineEmailCapture";
+import { OpenDaysButton } from "@/components/OpenDaysButton";
 import { ShareButton } from "@/components/ShareButton";
 import type { Course } from "@/data/coursesData";
 
@@ -196,14 +196,13 @@ export const ActionsScreen = ({
             </div>
           )}
 
-          {/* Inline Email Capture - Non-intrusive */}
+          {/* Open Days Button - Book university visit */}
           {selectedCourses.length > 0 && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
-              <InlineEmailCapture
-                matchedCourses={selectedCourses}
-                onEmailSubmitted={() => {
-                  // Email captured successfully
-                }}
+              <OpenDaysButton
+                variant="outline"
+                size="lg"
+                className="w-full"
               />
             </div>
           )}
