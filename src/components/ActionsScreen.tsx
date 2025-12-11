@@ -184,7 +184,7 @@ export const ActionsScreen = ({
               >
                 <Heart className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 fill-[#cd1f80]" />
                 <span className="truncate">
-                  {hasMultipleCourses ? `View ${currentCourse.name.split(' ')[0]}` : `Explore My Match`}
+                  {matchCount === 1 ? 'View Course' : 'View Courses'}
                 </span>
               </button>
             </div>

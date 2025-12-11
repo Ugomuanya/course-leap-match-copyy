@@ -367,8 +367,8 @@ const Matching = () => {
           )}
         </div>
 
-        {/* Card Stack Container */}
-        <div className="relative w-full max-w-md mx-auto mb-6 sm:mb-8" style={{ height: 'clamp(550px, 75vh, 650px)' }}>
+        {/* Card Stack Container - Responsive sizing */}
+        <div className="relative w-full max-w-md lg:max-w-lg mx-auto mb-6 sm:mb-8" style={{ height: 'clamp(500px, 70vh, 700px)' }}>
           {currentIndex >= suggestedCourses.length ? (
             // TWO-SCREEN COMPLETION FLOW
             <div className="absolute inset-0">
@@ -441,19 +441,19 @@ const Matching = () => {
                       {/* Overlay Pattern */}
                       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(253,219,53,0.1),transparent)]"></div>
 
-                      {/* Like/Nope Overlays */}
-                      <div className="absolute inset-0 flex items-start justify-between p-8 sm:p-12 pointer-events-none z-20">
+                      {/* Like/Nope Overlays - Visible on hover (desktop) and active/touch (mobile/tablet) */}
+                      <div className="absolute inset-0 flex items-start justify-between p-6 sm:p-8 md:p-12 pointer-events-none z-20">
                         {/* NOPE - Left */}
-                        <div className="transform -rotate-12 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                          <div className="px-6 py-3 border-4 border-red-500 rounded-2xl">
-                            <span className="text-red-500 font-black text-3xl sm:text-4xl">NOPE</span>
+                        <div className="transform -rotate-12 opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-active:opacity-100">
+                          <div className="px-4 py-2 sm:px-6 sm:py-3 border-4 border-red-500 rounded-xl sm:rounded-2xl bg-white/10 backdrop-blur-sm">
+                            <span className="text-red-500 font-black text-2xl sm:text-3xl md:text-4xl">NOPE</span>
                           </div>
                         </div>
 
                         {/* LIKE - Right */}
-                        <div className="transform rotate-12 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                          <div className="px-6 py-3 border-4 border-[#00ff00] rounded-2xl">
-                            <span className="text-[#00ff00] font-black text-3xl sm:text-4xl">LIKE</span>
+                        <div className="transform rotate-12 opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-active:opacity-100">
+                          <div className="px-4 py-2 sm:px-6 sm:py-3 border-4 border-[#00ff00] rounded-xl sm:rounded-2xl bg-white/10 backdrop-blur-sm">
+                            <span className="text-[#00ff00] font-black text-2xl sm:text-3xl md:text-4xl">LIKE</span>
                           </div>
                         </div>
                       </div>
@@ -514,34 +514,34 @@ const Matching = () => {
           )}
         </div>
 
-        {/* Swipe Action Buttons */}
+        {/* Swipe Action Buttons - Responsive sizing for all screens */}
         {currentIndex < suggestedCourses.length && (
-          <div className="flex justify-center items-center gap-4 sm:gap-6 mb-6 sm:mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <div className="flex justify-center items-center gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Pass Button */}
             <button
               onClick={() => swipe('left')}
-              className="group relative w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/15 hover:bg-red-500/20 active:scale-90 border-2 border-white/40 hover:border-red-500 flex items-center justify-center transition-all duration-300 shadow-xl"
+              className="group relative w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 rounded-full bg-white/15 hover:bg-red-500/20 active:scale-90 border-2 border-white/40 hover:border-red-500 flex items-center justify-center transition-all duration-300 shadow-xl"
               aria-label="Pass on this course"
             >
-              <X className="w-8 h-8 sm:w-10 sm:h-10 text-white group-hover:text-red-500 transition-colors stroke-[3]" />
+              <X className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 text-white group-hover:text-red-500 transition-colors stroke-[3]" />
             </button>
 
             {/* Info Button */}
             <button
               onClick={handleChat}
-              className="group relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white/15 hover:bg-white/25 active:scale-90 border-2 border-white/40 flex items-center justify-center transition-all duration-300"
+              className="group relative w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-white/15 hover:bg-white/25 active:scale-90 border-2 border-white/40 flex items-center justify-center transition-all duration-300"
               aria-label="Chat with advisor"
             >
-              <MessageCircle className="w-6 h-6 sm:w-7 sm:h-7 text-white transition-colors" />
+              <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white transition-colors" />
             </button>
 
             {/* Like Button */}
             <button
               onClick={() => swipe('right')}
-              className="group relative w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-[#fddb35] to-[#ffd700] hover:from-[#ffd700] hover:to-[#fddb35] active:scale-90 flex items-center justify-center transition-all duration-300 shadow-2xl hover:shadow-[0_0_30px_rgba(253,219,53,0.5)]"
+              className="group relative w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-[#fddb35] to-[#ffd700] hover:from-[#ffd700] hover:to-[#fddb35] active:scale-90 flex items-center justify-center transition-all duration-300 shadow-2xl hover:shadow-[0_0_30px_rgba(253,219,53,0.5)]"
               aria-label="Like this course"
             >
-              <Heart className="w-8 h-8 sm:w-10 sm:h-10 text-[#cd1f80] fill-[#cd1f80] group-hover:scale-110 transition-transform" />
+              <Heart className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 text-[#cd1f80] fill-[#cd1f80] group-hover:scale-110 transition-transform" />
             </button>
           </div>
         )}
