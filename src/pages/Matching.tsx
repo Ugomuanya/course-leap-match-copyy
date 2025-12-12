@@ -58,10 +58,11 @@ const Matching = () => {
 
   const childRefs = useRef<any[]>(suggestedCourses.map(() => React.createRef()));
 
-  // Check if matching session was previously completed
+  // Check if matching session was previously completed OR restore in-progress session
   useEffect(() => {
     const matchingCompleted = localStorage.getItem("matchingCompleted") === "true";
     const storedMatches = localStorage.getItem("matchedCourses");
+    const storedCurrentIndex = localStorage.getItem("currentSwipeIndex");
 
     if (matchingCompleted && storedMatches) {
       // User already completed matching - restore their state and skip to completion screen
@@ -77,6 +78,23 @@ const Matching = () => {
         // Clear corrupted data and proceed normally
         localStorage.removeItem("matchingCompleted");
         localStorage.removeItem("matchedCourses");
+        localStorage.removeItem("currentSwipeIndex");
+      }
+    } else if (storedCurrentIndex && storedMatches) {
+      // Restore in-progress swipe session (user went to view match then came back)
+      try {
+        const savedIndex = parseInt(storedCurrentIndex, 10);
+        const savedMatches = JSON.parse(storedMatches);
+
+        // Only restore if the saved index is valid
+        if (savedIndex >= 0 && savedIndex < suggestedCourses.length) {
+          setCurrentIndex(savedIndex);
+          setSelectedCourses(savedMatches);
+          setShowResult(true); // Show results immediately (skip loading)
+        }
+      } catch (error) {
+        console.error("Error restoring swipe progress:", error);
+        localStorage.removeItem("currentSwipeIndex");
       }
     }
   }, [suggestedCourses.length]);
@@ -123,9 +141,12 @@ const Matching = () => {
   const onSwipe = (direction: string, course: Course) => {
     setLastDirection(direction);
 
+    let updatedMatches = selectedCourses;
+
     if (direction === 'right') {
       // Add course to selected
-      setSelectedCourses(prev => [...prev, course]);
+      updatedMatches = [...selectedCourses, course];
+      setSelectedCourses(updatedMatches);
 
       // Haptic feedback for mobile devices
       if ('vibrate' in navigator) {
@@ -154,11 +175,17 @@ const Matching = () => {
       setCurrentIndex(prev => {
         const newIndex = prev + 1;
 
+        // Save progress to localStorage after each swipe
+        localStorage.setItem("matchedCourses", JSON.stringify(updatedMatches));
+        localStorage.setItem("currentSwipeIndex", newIndex.toString());
+
         // Check if this was the last card
         if (newIndex >= suggestedCourses.length) {
           // Mark matching as completed
           localStorage.setItem("matchingCompleted", "true");
           localStorage.setItem("matchingCompletedAt", new Date().toISOString());
+          // Clear swipe progress since matching is complete
+          localStorage.removeItem("currentSwipeIndex");
         }
 
         return newIndex;
@@ -233,6 +260,7 @@ const Matching = () => {
   const handleViewCourses = () => {
     if (selectedCourses.length > 0) {
       localStorage.setItem("matchedCourses", JSON.stringify(selectedCourses));
+      localStorage.setItem("currentSwipeIndex", currentIndex.toString());
       navigate("/course-details");
     }
   };
@@ -249,14 +277,16 @@ const Matching = () => {
   };
 
   const handleRestart = () => {
+    // Clear all storage including swipe progress
     localStorage.clear();
-    sessionStorage.clear(); // Clear session storage to show loading animation on restart
+    sessionStorage.clear();
     navigate("/");
   };
 
   const handleViewMatchFromModal = () => {
-    // Save matches and navigate to course details
+    // Save matches AND current swipe progress before navigating
     localStorage.setItem("matchedCourses", JSON.stringify(selectedCourses));
+    localStorage.setItem("currentSwipeIndex", currentIndex.toString());
     navigate("/course-details");
   };
 
