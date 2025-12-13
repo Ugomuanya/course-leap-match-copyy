@@ -48,11 +48,19 @@ export async function getChatResponse(
 
     // Build conversation history for context
     // Filter out the initial bot greeting (Gemini requires history to start with user)
-    const filteredHistory = conversationHistory.filter((msg, index) => {
-      // Skip initial bot messages before the first user message
-      const firstUserIndex = conversationHistory.findIndex(m => m.role === "user");
-      return index >= firstUserIndex;
-    });
+    const firstUserIndex = conversationHistory.findIndex(m => m.role === "user");
+
+    // If no user messages yet, start with empty history
+    if (firstUserIndex === -1) {
+      const chat = model.startChat({
+        history: [],
+      });
+      const result = await chat.sendMessage(userMessage);
+      return result.response.text();
+    }
+
+    // Get messages starting from first user message
+    const filteredHistory = conversationHistory.slice(firstUserIndex);
 
     const chatHistory = filteredHistory.map(msg => ({
       role: msg.role === "user" ? "user" : "model",
