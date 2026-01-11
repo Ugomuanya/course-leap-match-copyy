@@ -1,4 +1,4 @@
-# Welcome to Course-leap-match-copy
+# Welcome to Course-leap-match
 
 ## Project info
 
