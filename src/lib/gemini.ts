@@ -1,79 +1,24 @@
-import { GoogleGenAI } from "@google/genai";
-
-// Initialize Gemini API
-const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-
-if (!apiKey) {
-  console.warn("⚠️ VITE_GEMINI_API_KEY not found. Chat will use fallback responses.");
-}
-
-const genAI = apiKey ? new GoogleGenAI({ apiKey }) : null;
-
-// System prompt with University of Lincoln context
-const SYSTEM_INSTRUCTION = `You are a friendly and knowledgeable University of Lincoln course advisor chatbot. Your role is to help prospective students learn about courses, entry requirements, campus life, and the application process.
-
-Key Information:
-- University: University of Lincoln, UK
-- Location: Historic city of Lincoln, England
-- Courses: 220+ undergraduate courses across 13 schools
-- Entry Requirements: Typically 96-112 UCAS points (varies by course)
-- Tuition Fees: £9,250/year for UK students
-- Application: Through UCAS, deadline typically January for September entry
-- Campus: Modern facilities in city center, student accommodation nearby
-- Support: Academic tutoring, career guidance, mental health services, international student support
-
-Your personality:
-- Friendly, enthusiastic, and supportive
-- Use emojis occasionally to be engaging
-- Keep responses concise (2-4 sentences)
-- Encourage students to explore courses they're interested in
-- If you don't know something specific, suggest they contact admissions team
-
-Always be positive about University of Lincoln and focus on helping students find their perfect course!`;
+// Chat replies come from our own /api/chat function, which holds the Gemini
+// key on the server. The key is never in the browser bundle any more.
 
 export async function getChatResponse(
   userMessage: string,
   conversationHistory: Array<{ role: string; content: string }> = []
 ): Promise<string> {
-  // Fallback if no API key
-  if (!genAI) {
-    return getFallbackResponse(userMessage);
-  }
-
   try {
-    // Build conversation contents from history
-    // Filter out the initial bot greeting (must start with user message)
-    const firstUserIndex = conversationHistory.findIndex(m => m.role === "user");
-
-    let contents: Array<{ role: string; parts: Array<{ text: string }> }> = [];
-
-    // Add conversation history if exists
-    if (firstUserIndex !== -1) {
-      const filteredHistory = conversationHistory.slice(firstUserIndex);
-      contents = filteredHistory.map(msg => ({
-        role: msg.role === "user" ? "user" : "model",
-        parts: [{ text: msg.content }]
-      }));
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: userMessage, history: conversationHistory }),
+    });
+    if (!res.ok) {
+      console.warn(`Chat API returned ${res.status}; using fallback response.`);
+      return getFallbackResponse(userMessage);
     }
-
-    // Add current user message
-    contents.push({
-      role: "user",
-      parts: [{ text: userMessage }]
-    });
-
-    // Generate response using new API
-    const response = await genAI.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: contents,
-      config: {
-        systemInstruction: SYSTEM_INSTRUCTION
-      }
-    });
-
-    return response.text || getFallbackResponse(userMessage);
+    const data: { text?: string } = await res.json();
+    return data.text?.trim() || getFallbackResponse(userMessage);
   } catch (error) {
-    console.error("Gemini API Error:", error);
+    console.error("Chat API error:", error);
     return getFallbackResponse(userMessage);
   }
 }
