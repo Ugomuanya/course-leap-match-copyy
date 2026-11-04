@@ -5,7 +5,9 @@ import { GoogleGenAI } from "@google/genai";
 // VITE_GEMINI_API_KEY in the browser, which baked the key into the public JS
 // bundle where anyone could copy it and run up the Google Cloud bill.
 
-const MODEL = "gemini-2.5-flash";
+// Tried in order: when one is busy (503) or out of free quota (429), the next
+// has its own capacity and quota.
+const MODELS = ["gemini-2.5-flash", "gemini-2.5-flash-lite"];
 const MAX_MESSAGE_CHARS = 1000;
 const MAX_HISTORY = 12;
 const MAX_HISTORY_CHARS = 2000;
@@ -111,21 +113,27 @@ export async function POST(request: Request): Promise<Response> {
   }));
   contents.push({ role: "user", parts: [{ text: body.message }] });
 
-  try {
-    const response = await new GoogleGenAI({ apiKey }).models.generateContent({
-      model: MODEL,
-      contents,
-      config: {
-        systemInstruction: SYSTEM_INSTRUCTION,
-        maxOutputTokens: MAX_OUTPUT_TOKENS,
-        // Short chat answers don't need "thinking"; it would also eat the
-        // output budget (and cost) on 2.5 Flash.
-        thinkingConfig: { thinkingBudget: 0 },
-      },
-    });
-    return json({ text: response.text ?? "" });
-  } catch (error) {
-    console.error("[chat] Gemini error:", error instanceof Error ? error.message : String(error));
-    return json({ error: "upstream_error" }, 502);
+  const ai = new GoogleGenAI({ apiKey });
+  for (const model of MODELS) {
+    try {
+      const response = await ai.models.generateContent({
+        model,
+        contents,
+        config: {
+          systemInstruction: SYSTEM_INSTRUCTION,
+          maxOutputTokens: MAX_OUTPUT_TOKENS,
+          // Short chat answers don't need "thinking"; it would also eat the
+          // output budget (and cost) on 2.5 Flash.
+          thinkingConfig: { thinkingBudget: 0 },
+        },
+      });
+      return json({ text: response.text ?? "" });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      const retryable = /"code":\s*(429|503)|RESOURCE_EXHAUSTED|UNAVAILABLE/.test(message);
+      console.error(`[chat] Gemini error (${model}):`, message.slice(0, 300));
+      if (!retryable) break;
+    }
   }
+  return json({ error: "upstream_error" }, 502);
 }
